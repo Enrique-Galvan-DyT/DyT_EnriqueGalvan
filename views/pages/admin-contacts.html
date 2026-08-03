@@ -1,0 +1,339 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Mensajes de <span class="gold-text">Contacto</span></h1>
+        <p class="dashboard-subtitle">Solicitudes de cotizacion y proyectos</p>
+      </div>
+      <a href="#/admin" class="btn btn-secondary">
+        <i class="ph-light ph-arrow-left"></i> Volver
+      </a>
+    </div>
+
+    <div class="dashboard-stats reveal reveal-delay-1">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="ph-light ph-envelope-simple"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statTotal">0</span>
+          <span class="stat-card-label">Total</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--open">
+          <i class="ph-light ph-envelope"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statUnread">0</span>
+          <span class="stat-card-label">Sin leer</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--resolved">
+          <i class="ph-light ph-check-circle"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statRead">0</span>
+          <span class="stat-card-label">Leidos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-section reveal reveal-delay-2" style="margin-top:1.5rem;">
+      <div class="dashboard-section-header" style="flex-wrap:wrap;gap:0.75rem;">
+        <h3>Mensajes</h3>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-sm btn-secondary filter-btn active" data-filter="all">Todos</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="unread">Sin leer</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="read">Leidos</button>
+        </div>
+      </div>
+      <div id="contactInquiriesList" class="contact-list">
+        <div class="contact-list-empty">
+          <i class="ph-light ph-envelope-simple"></i>
+          <p>Cargando mensajes...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="contactDetailModal" class="academy-modal-overlay" style="display:none;">
+    <div class="academy-modal-card" style="max-width:600px;">
+      <div class="academy-modal-header">
+        <h3>Detalle del mensaje</h3>
+        <button class="academy-modal-close" id="btnCloseDetail"><i class="ph-light ph-x"></i></button>
+      </div>
+      <div class="academy-modal-body">
+        <div class="contact-detail-row">
+          <span class="contact-detail-label">Nombre</span>
+          <span class="contact-detail-value" id="detailName">-</span>
+        </div>
+        <div class="contact-detail-row">
+          <span class="contact-detail-label">Email</span>
+          <span class="contact-detail-value" id="detailEmail">-</span>
+        </div>
+        <div class="contact-detail-row">
+          <span class="contact-detail-label">Tipo de proyecto</span>
+          <span class="contact-detail-value" id="detailProjectType">-</span>
+        </div>
+        <div class="contact-detail-row">
+          <span class="contact-detail-label">Presupuesto</span>
+          <span class="contact-detail-value" id="detailBudget">-</span>
+        </div>
+        <div class="contact-detail-row">
+          <span class="contact-detail-label">Fecha</span>
+          <span class="contact-detail-value" id="detailDate">-</span>
+        </div>
+        <div class="contact-detail-row contact-detail-row--full">
+          <span class="contact-detail-label">Mensaje</span>
+          <p class="contact-detail-message" id="detailMessage">-</p>
+        </div>
+      </div>
+      <div class="academy-modal-footer">
+        <button class="btn btn-secondary" id="btnCloseDetail2">Cerrar</button>
+        <a id="detailEmailLink" href="" class="btn btn-primary">
+          <i class="ph-light ph-envelope-simple"></i> Responder
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="academy-modal-overlay" style="display:none;">
+    <div class="academy-modal-card" style="max-width:400px;">
+      <div class="academy-modal-header">
+        <h3>Confirmar</h3>
+        <button class="academy-modal-close" id="btnConfirmClose"><i class="ph-light ph-x"></i></button>
+      </div>
+      <div class="academy-modal-body">
+        <p id="confirmMessage" style="margin:0;color:var(--text-secondary);">¿Estás seguro?</p>
+      </div>
+      <div class="academy-modal-footer">
+        <button class="btn btn-secondary" id="btnConfirmCancel">Cancelar</button>
+        <button class="btn btn-primary" id="btnConfirmAccept">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var currentFilter = 'all';
+  var allInquiries = [];
+  var detailModal = document.getElementById('contactDetailModal');
+
+  var projectTypeLabels = {
+    landing: 'Landing Page',
+    webapp: 'Web App',
+    ecommerce: 'E-commerce',
+    dashboard: 'Dashboard',
+    api: 'API / Backend',
+    other: 'Otro'
+  };
+
+  function loadInquiries() {
+    getContactInquiries().then(function(data) {
+      allInquiries = data || [];
+      updateStats();
+      renderList();
+    });
+  }
+
+  function updateStats() {
+    var total = allInquiries.length;
+    var unread = allInquiries.filter(function(r) { return !r.isRead; }).length;
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statUnread').textContent = unread;
+    document.getElementById('statRead').textContent = total - unread;
+  }
+
+  function renderList() {
+    var container = document.getElementById('contactInquiriesList');
+    var filtered = currentFilter === 'all'
+      ? allInquiries
+      : allInquiries.filter(function(r) {
+          return currentFilter === 'unread' ? !r.isRead : r.isRead;
+        });
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="contact-list-empty"><i class="ph-light ph-envelope-simple"></i><p>No hay mensajes</p></div>';
+      return;
+    }
+
+    var sorted = filtered.slice().sort(function(a, b) {
+      var da = new Date(a.createdAt || a.CreatedAt || 0);
+      var db = new Date(b.createdAt || b.CreatedAt || 0);
+      return db - da;
+    });
+
+    var groups = [];
+    var currentGroup = null;
+    sorted.forEach(function(r) {
+      var key = getDateGroupLabel(r.createdAt || r.CreatedAt);
+      if (!currentGroup || currentGroup.label !== key) {
+        currentGroup = { label: key, items: [] };
+        groups.push(currentGroup);
+      }
+      currentGroup.items.push(r);
+    });
+
+    var html = '';
+    groups.forEach(function(group) {
+      html += '<div class="contact-date-separator"><span>' + escapeHtml(group.label) + '</span></div>';
+      group.items.forEach(function(r) {
+        var id = r.id || r.Id_ContactInquiry;
+        var name = r.name || r.Name || '';
+        var email = r.email || r.Email || '';
+        var projectType = r.projectType || r.ProjectType || '';
+        var budget = r.budget || r.Budget || '';
+        var message = r.message || r.Message || '';
+        var isRead = r.isRead !== undefined ? r.isRead : (r.IsRead !== undefined ? r.IsRead : false);
+        var createdAt = r.createdAt || r.CreatedAt || '';
+
+        var preview = message.length > 80 ? message.substring(0, 80) + '...' : message;
+        var unreadClass = isRead ? '' : ' contact-item--unread';
+        var pTypeLabel = projectTypeLabels[projectType] || projectType;
+
+        html += '<div class="contact-item' + unreadClass + '" data-id="' + id + '">' +
+          '<div class="contact-item-left">' +
+            '<span class="contact-item-name">' + escapeHtml(name) + ' <span style="font-weight:400;color:var(--text-muted);font-size:0.8125rem;">' + escapeHtml(email) + '</span></span>' +
+            '<p class="contact-item-desc">' + escapeHtml(preview) + '</p>' +
+            '<div class="contact-item-meta">' +
+              (pTypeLabel ? '<span class="academia-badge academia-badge--all">' + pTypeLabel + '</span>' : '') +
+              (budget ? '<span class="academia-duration"><i class="ph-light ph-currency-dollar"></i> ' + escapeHtml(budget) + '</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="contact-item-right">' +
+            '<span class="contact-item-date">' + formatDate(createdAt) + '</span>' +
+            '<div class="contact-item-actions">' +
+              '<button onclick="contactCRUD.view(' + id + ')"><i class="ph-light ph-eye"></i></button>' +
+              '<button class="btn-delete" onclick="contactCRUD.remove(' + id + ')"><i class="ph-light ph-trash"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+    });
+
+    container.innerHTML = html;
+  }
+
+  function openDetail(id) {
+    var inquiry = allInquiries.find(function(r) { return (r.Id_ContactInquiry || r.id) === id; });
+    if (!inquiry) return;
+
+    document.getElementById('detailName').textContent = inquiry.name || inquiry.Name || '-';
+    document.getElementById('detailEmail').textContent = inquiry.email || inquiry.Email || '-';
+    document.getElementById('detailProjectType').textContent = projectTypeLabels[inquiry.projectType || inquiry.ProjectType] || inquiry.projectType || inquiry.ProjectType || '-';
+    document.getElementById('detailBudget').textContent = inquiry.budget || inquiry.Budget || '-';
+    document.getElementById('detailDate').textContent = formatDate(inquiry.createdAt || inquiry.CreatedAt || '');
+    document.getElementById('detailMessage').textContent = inquiry.message || inquiry.Message || '-';
+
+    var email = inquiry.email || inquiry.Email || '';
+    document.getElementById('detailEmailLink').href = 'mailto:' + email;
+
+    detailModal.style.display = 'flex';
+
+    var isRead = inquiry.isRead !== undefined ? inquiry.isRead : (inquiry.IsRead !== undefined ? inquiry.IsRead : true);
+    if (!isRead) {
+      markContactAsRead(id);
+    }
+  }
+
+  function closeDetail() {
+    detailModal.style.display = 'none';
+  }
+
+  document.getElementById('btnCloseDetail').addEventListener('click', closeDetail);
+  document.getElementById('btnCloseDetail2').addEventListener('click', closeDetail);
+  detailModal.addEventListener('click', function(e) {
+    if (e.target === detailModal) closeDetail();
+  });
+
+  // --- Confirm Modal ---
+  var confirmModal = document.getElementById('confirmModal');
+  var confirmCallback = null;
+
+  function showConfirm(message, callback) {
+    document.getElementById('confirmMessage').textContent = message;
+    confirmCallback = callback;
+    confirmModal.style.display = 'flex';
+  }
+
+  function closeConfirm() {
+    confirmModal.style.display = 'none';
+    confirmCallback = null;
+  }
+
+  document.getElementById('btnConfirmClose').addEventListener('click', closeConfirm);
+  document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
+  confirmModal.addEventListener('click', function(e) {
+    if (e.target === confirmModal) closeConfirm();
+  });
+  document.getElementById('btnConfirmAccept').addEventListener('click', function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      renderList();
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function toDateKey(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function getDateGroupLabel(dateStr) {
+    if (!dateStr) return 'Sin fecha';
+    var d = new Date(dateStr);
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var diff = Math.floor((today - target) / 86400000);
+
+    if (diff === 0) return 'Hoy';
+    if (diff === 1) return 'Ayer';
+    if (diff < 7) return 'Esta semana';
+    var months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    return months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  window.contactCRUD = {
+    view: function(id) {
+      openDetail(id);
+    },
+    remove: function(id) {
+      showConfirm('Eliminar este mensaje?', function() {
+        deleteContactInquiry(id).then(function(res) {
+          if (res.success !== false) loadInquiries();
+        });
+      });
+    }
+  };
+
+  loadInquiries();
+})();
+</script>

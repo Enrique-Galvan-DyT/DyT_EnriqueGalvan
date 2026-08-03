@@ -1,0 +1,122 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="public/media/images/logo g.png" alt="DyT_EG" class="auth-logo-img">
+      </div>
+      <h2 class="auth-title">Iniciar Sesión</h2>
+      <p class="auth-subtitle">Accede a tu panel para gestionar tus proyectos</p>
+    </div>
+
+    <form id="loginForm" class="auth-form">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">Correo electrónico</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-envelope form-input-icon"></i>
+          <input type="email" id="loginEmail" class="form-input" placeholder="tu@email.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Contraseña</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-lock-key form-input-icon"></i>
+          <input type="password" id="loginPassword" class="form-input" placeholder="Tu contraseña" required>
+          <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">
+            <i class="ph-light ph-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="loginError" class="auth-error" style="display:none"></div>
+
+      <div class="form-group" style="display:flex;justify-content:center;align-items: center;">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAD-ll4MBRA3lg5Bf" data-theme="dark"></div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+        <span class="btn-text">Iniciar Sesión</span>
+        <span class="btn-loading" style="display:none">
+          <i class="ph-light ph-spinner"></i> Conectando...
+        </span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>¿No tienes una cuenta? <a href="#/register" class="auth-link">Regístrate aquí</a></p>
+    </div>
+
+    <div class="auth-back">
+      <a href="#/" class="auth-link-sm">
+        <i class="ph-light ph-arrow-left"></i> Volver al inicio
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var form = document.getElementById('loginForm');
+  var btn = document.getElementById('loginBtn');
+  var errorEl = document.getElementById('loginError');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var email = document.getElementById('loginEmail').value.trim();
+    var password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+      showError('Por favor completa todos los campos');
+      return;
+    }
+
+    var turnstileToken = DyTTurnstile.getToken();
+    if (!turnstileToken) {
+      showError('Completa la verificación de seguridad');
+      return;
+    }
+
+    btn.querySelector('.btn-text').style.display = 'none';
+    btn.querySelector('.btn-loading').style.display = 'inline';
+    btn.disabled = true;
+    hideError();
+
+    DyTAuth.login(email, password, turnstileToken)
+      .then(function(user) {
+        if (user.role === 'admin') {
+          navigateTo('admin');
+        } else {
+          navigateTo('dashboard');
+        }
+      })
+      .catch(function(err) {
+        showError(err.message || 'Credenciales incorrectas');
+        DyTTurnstile.reset();
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loading').style.display = 'none';
+        btn.disabled = false;
+      });
+  });
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+  }
+
+  function hideError() {
+    errorEl.style.display = 'none';
+  }
+
+  window.togglePassword = function(inputId, btn) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'ph-light ph-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'ph-light ph-eye';
+    }
+  };
+})();
+</script>

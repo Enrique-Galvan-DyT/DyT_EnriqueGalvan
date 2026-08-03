@@ -1,0 +1,147 @@
+<!-- Testimonials Section - Dark Luxury -->
+<section id="testimonios" style="padding: var(--section-padding) 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <span class="eyebrow reveal">
+        <i class="ph-light ph-chat-circle-text"></i>
+        Testimonios
+      </span>
+      <h2 class="reveal reveal-delay-1" style="margin-bottom: 1rem;">Lo que dicen nuestros clientes</h2>
+    </div>
+
+    <div class="testimonials-wrap reveal reveal-delay-2">
+      <div class="testimonials-track" id="testimonialsTrack">
+        <div class="testimonial-card" style="min-width:100%;">
+          <div class="skeleton" style="height:18px;width:110px;margin-bottom:1.25rem;"></div>
+          <div class="skeleton skeleton-line" style="height:14px;"></div>
+          <div class="skeleton skeleton-line" style="height:14px;width:80%;"></div>
+          <div class="skeleton" style="height:14px;width:60%;margin-bottom:2rem;"></div>
+          <div style="display:flex;align-items:center;gap:0.875rem;">
+            <div class="skeleton" style="width:2.75rem;height:2.75rem;border-radius:50%;"></div>
+            <div style="flex:1;">
+              <div class="skeleton skeleton-line" style="height:12px;width:45%;"></div>
+              <div class="skeleton skeleton-line" style="height:10px;width:30%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="testimonials-nav">
+        <button class="testimonials-btn" id="testPrev" aria-label="Anterior">
+          <i class="ph-light ph-caret-left"></i>
+        </button>
+        <div class="testimonials-dots" id="testDots"></div>
+        <button class="testimonials-btn" id="testNext" aria-label="Siguiente">
+          <i class="ph-light ph-caret-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var track = document.getElementById('testimonialsTrack');
+  var dotsWrap = document.getElementById('testDots');
+  var prev = document.getElementById('testPrev');
+  var next = document.getElementById('testNext');
+  var current = 0;
+  var total = 0;
+  var autoplay = null;
+
+  function startAutoplay() {
+    stopAutoplay();
+    if (total > 1) autoplay = setInterval(function() { goTo(current + 1); }, 6000);
+  }
+
+  function stopAutoplay() {
+    if (autoplay) { clearInterval(autoplay); autoplay = null; }
+  }
+
+  function buildDots(count) {
+    dotsWrap.innerHTML = '';
+    for (var i = 0; i < count; i++) {
+      (function(idx) {
+        var b = document.createElement('button');
+        b.className = 'dot' + (idx === 0 ? ' active' : '');
+        b.setAttribute('aria-label', 'Testimonio ' + (idx + 1));
+        b.addEventListener('click', function() { goTo(idx); });
+        dotsWrap.appendChild(b);
+      })(i);
+    }
+  }
+
+  function goTo(index) {
+    if (total === 0) return;
+    current = (index + total) % total;
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    var dots = dotsWrap.querySelectorAll('.dot');
+    for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === current);
+  }
+
+  prev.addEventListener('click', function() { goTo(current - 1); });
+  next.addEventListener('click', function() { goTo(current + 1); });
+
+  var wrap = document.querySelector('.testimonials-wrap');
+  wrap.addEventListener('mouseenter', stopAutoplay);
+  wrap.addEventListener('mouseleave', startAutoplay);
+
+  function renderCards(list) {
+    if (!list.length) { renderEmpty(); return; }
+
+    var colors = ['var(--accent-primary)', 'var(--accent-secondary)', 'var(--accent-warm)', 'var(--accent-burgundy)'];
+    track.innerHTML = list.map(function(t, i) {
+      var tName = t.clientName || 'Cliente';
+      var initial = tName.charAt(0).toUpperCase();
+      var color = colors[i % 4];
+      var lightText = (i % 4 === 1 || i % 4 === 2) ? 'color:#0C0C0C;' : '';
+      return '<div class="testimonial-card">' +
+        '<div class="testimonial-stars" data-stars="' + i + '"></div>' +
+        '<p class="testimonial-text">"' + escapeHtml(t.content || '') + '"</p>' +
+        '<div class="testimonial-author">' +
+          '<div class="testimonial-avatar" style="background:' + color + ';' + lightText + '">' + escapeHtml(initial) + '</div>' +
+          '<div>' +
+            '<strong>' + escapeHtml(tName) + '</strong>' +
+            '<span>' + escapeHtml(t.projectName || '') + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    var starEls = track.querySelectorAll('[data-stars]');
+    list.forEach(function(t, i) { renderStars(starEls[i], t.rating); });
+
+    total = list.length;
+    buildDots(total);
+    goTo(0);
+    startAutoplay();
+  }
+
+  function renderEmpty() {
+    track.innerHTML =
+      '<div class="testimonial-card" style="min-width:100%;">' +
+        '<div style="text-align:center;padding:3rem 1rem;">' +
+          '<i class="ph-light ph-chat-circle-dots" style="font-size:2.5rem;color:var(--border-medium);"></i>' +
+          '<p style="font-family:var(--font-serif);font-size:1.0625rem;color:var(--text-secondary);margin:1rem 0 0.25rem;">Aún no hay testimonios</p>' +
+          '<p style="font-size:0.875rem;color:var(--text-muted);margin:0;">Cuando un cliente valore un proyecto, aparecerá aquí.</p>' +
+        '</div>' +
+      '</div>';
+    total = 0;
+    buildDots(0);
+    goTo(0);
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  getTestimonials().then(function(list) {
+    renderCards(list || []);
+  });
+})();
+</script>

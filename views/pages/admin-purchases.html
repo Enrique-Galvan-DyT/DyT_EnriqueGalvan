@@ -1,0 +1,198 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Compras de <span class="gold-text">Clientes</span></h1>
+        <p class="dashboard-subtitle">Planes y recursos adquiridos por cada cliente</p>
+      </div>
+      <a href="#/admin" class="btn btn-secondary">
+        <i class="ph-light ph-arrow-left"></i> Volver
+      </a>
+    </div>
+
+    <div class="dashboard-stats reveal reveal-delay-1">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="ph-light ph-shopping-cart-simple"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statTotal">0</span>
+          <span class="stat-card-label">Compras</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--warm">
+          <i class="ph-light ph-gem"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statPlans">0</span>
+          <span class="stat-card-label">Planes</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--secondary">
+          <i class="ph-light ph-book-open"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statResources">0</span>
+          <span class="stat-card-label">Recursos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--resolved">
+          <i class="ph-light ph-currency-dollar"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statRevenue">$0</span>
+          <span class="stat-card-label">Ingresos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-section reveal reveal-delay-2" style="margin-top:1.5rem;">
+      <div class="dashboard-section-header" style="flex-wrap:wrap;gap:0.75rem;">
+        <h3>Historial</h3>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span id="copyFlash" style="display:none;color:#4CAF50;font-size:0.8125rem;"><i class="ph-light ph-check-circle"></i> Resumen copiado</span>
+          <button class="btn btn-sm btn-secondary filter-btn active" data-filter="all">Todos</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="plan">Planes</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="resource">Recursos</button>
+        </div>
+      </div>
+      <div id="purchasesList" class="contact-list">
+        <div class="contact-list-empty">
+          <i class="ph-light ph-shopping-cart-simple"></i>
+          <p>Cargando compras...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var currentFilter = 'all';
+  var all = [];
+
+  function load() {
+    getAdminPurchases().then(function(data) {
+      all = data || [];
+      updateStats();
+      render();
+    });
+  }
+
+  function updateStats() {
+    var plans = all.filter(function(p) { return p.resourceCategory === 'plan'; });
+    var resources = all.filter(function(p) { return p.resourceCategory !== 'plan'; });
+    var revenue = all.filter(function(p) { return p.paymentStatus === 'paid'; })
+      .reduce(function(s, p) { return s + (Number(p.amount) || 0); }, 0);
+    document.getElementById('statTotal').textContent = all.length;
+    document.getElementById('statPlans').textContent = plans.length;
+    document.getElementById('statResources').textContent = resources.length;
+    document.getElementById('statRevenue').textContent = '$' + formatMoney(revenue);
+  }
+
+  function render() {
+    var container = document.getElementById('purchasesList');
+    var filtered = currentFilter === 'all' ? all : all.filter(function(p) {
+      return currentFilter === 'plan' ? p.resourceCategory === 'plan' : p.resourceCategory !== 'plan';
+    });
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="contact-list-empty"><i class="ph-light ph-shopping-cart-simple"></i><p>No hay compras</p></div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(function(p) {
+      var isPlan = p.resourceCategory === 'plan';
+      var title = p.resourceTitle || ((isPlan ? 'Plan' : 'Recurso') + ' sin titulo');
+      var catLabel = isPlan ? 'Plan' : (p.resourceCategory || 'Recurso');
+      var paid = p.paymentStatus === 'paid';
+      var typeBadge = '<span class="academia-badge academia-badge--all"' +
+        (isPlan ? ' style="background:rgba(201,168,76,0.15);color:#C9A84C;"' : '') + '>' + escapeHtml(catLabel) + '</span>';
+      var statusBadge = '<span style="display:inline-block;padding:0.1875rem 0.5rem;border-radius:var(--radius-sm);font-size:0.6875rem;font-weight:500;' +
+        (paid ? 'background:rgba(76,175,80,0.12);color:#4CAF50;"' : 'background:rgba(255,152,0,0.12);color:#FF9800;"') +
+        '>' + (paid ? 'Pagado' : escapeHtml(p.paymentStatus || 'pendiente')) + '</span>';
+
+      return '<div class="contact-item">' +
+        '<div class="contact-item-left">' +
+          '<span class="contact-item-name">' + escapeHtml(p.userName) +
+            ' <span style="font-weight:400;color:var(--text-muted);font-size:0.8125rem;">' + escapeHtml(p.userEmail) + '</span></span>' +
+          '<p class="contact-item-desc">' + escapeHtml(title) + '</p>' +
+          '<div class="contact-item-meta">' +
+            typeBadge +
+            '<span class="academia-duration"><i class="ph-light ph-currency-dollar"></i> $' + formatMoney(p.amount) + '</span>' +
+            statusBadge +
+            (p.orderId ? '<span class="academia-duration"><i class="ph-light ph-hash"></i> ' + escapeHtml(p.orderId) + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="contact-item-right">' +
+          '<span class="contact-item-date">' + formatDate(p.createdAt) + '</span>' +
+          '<div class="contact-item-actions">' +
+            '<button title="Copiar resumen" onclick="purchaseAdmin.copy(' + p.id + ')"><i class="ph-light ph-copy"></i></button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  window.purchaseAdmin = {
+    copy: function(id) {
+      var p = all.find(function(x) { return x.id === id; });
+      if (!p) return;
+      var txt = 'Cliente: ' + (p.userName || '') + ' (' + (p.userEmail || '') + ')\n' +
+        'Adquirio: ' + (p.resourceTitle || '') + ' [' + (p.resourceCategory || '') + ']\n' +
+        'Monto: $' + formatMoney(p.amount) + ' ' + (p.currency || 'MXN') + '\n' +
+        'Orden: ' + (p.orderId || '-') + '\n' +
+        'Fecha: ' + formatDate(p.createdAt);
+      var done = function() {
+        var flash = document.getElementById('copyFlash');
+        if (flash) {
+          flash.style.display = '';
+          setTimeout(function() { flash.style.display = 'none'; }, 2000);
+        }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(done, done);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = txt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      }
+    }
+  };
+
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      render();
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function formatMoney(n) {
+    return Number(n || 0).toLocaleString('es-MX', { maximumFractionDigits: 2 });
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  load();
+})();
+</script>

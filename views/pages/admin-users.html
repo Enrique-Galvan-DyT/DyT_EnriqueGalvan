@@ -1,0 +1,127 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Verificación de <span class="gold-text">Cuentas</span></h1>
+        <p class="dashboard-subtitle">Activa cuentas de una vez o genera enlaces de verificación para enviar por correo</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <a href="#/admin" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> Volver
+        </a>
+        <button class="btn btn-primary" id="btnRefreshUsers">
+          <i class="ph-light ph-arrow-clockwise"></i> Actualizar
+        </button>
+      </div>
+    </div>
+
+    <div class="dashboard-section reveal reveal-delay-1" style="margin-top:1.5rem;">
+      <div id="pendingUsers" class="academy-resources-list">
+        <div class="academy-list-empty">
+          <i class="ph-light ph-user-clock"></i>
+          <p>Cargando usuarios pendientes...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  function load() {
+    var container = document.getElementById('pendingUsers');
+    authGetPending().then(function(users) {
+      if (!users.length) {
+        container.innerHTML =
+          '<div class="academy-list-empty"><i class="ph-light ph-user-check"></i><p>No hay usuarios pendientes de verificar</p></div>';
+        return;
+      }
+
+      container.innerHTML = users.map(function(u) {
+        return '<div class="academy-resource-item">' +
+          '<div class="academy-resource-left">' +
+            '<span class="academy-resource-title">' + escapeHtml(u.name) + '</span>' +
+            '<p class="academy-resource-desc">' + escapeHtml(u.email) + '</p>' +
+            '<div class="academy-resource-meta">' +
+              '<span class="project-visibility-badge project-visibility-private">Pendiente</span>' +
+              '<span style="font-size:0.75rem;color:var(--text-muted);"><i class="ph-light ph-calendar"></i> ' + formatDate(u.createdAt) + '</span>' +
+            '</div>' +
+          '</div>' +
+            '<div class="academy-resource-right">' +
+            '<div class="academy-resource-actions">' +
+              '<button data-activate="' + u.id + '" title="Activar cuenta (cambiar rol a básico)" style="border-color:var(--accent-primary);color:var(--accent-primary);"><i class="ph-light ph-check"></i></button>' +
+              '<button data-link="' + u.id + '" title="Copiar enlace de verificación"><i class="ph-light ph-link-simple"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      container.querySelectorAll('[data-activate]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var uid = parseInt(btn.getAttribute('data-activate'));
+          btn.disabled = true;
+          authActivateUser(uid).then(function(res) {
+            btn.disabled = false;
+            if (res && res.success) {
+              showError('Usuario activado: ya puede iniciar sesión');
+              load();
+            } else {
+              showError((res && res.message) || 'Error al activar el usuario');
+            }
+          });
+        });
+      });
+
+      container.querySelectorAll('[data-link]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var uid = parseInt(btn.getAttribute('data-link'));
+          btn.disabled = true;
+          authGetVerifyLink(uid).then(function(res) {
+            btn.disabled = false;
+            if (res.success !== false && res.data && res.data.token) {
+              var full = window.location.origin + '/#/verify/' + res.data.token;
+              copyText(full);
+              showError('Enlace de verificación copiado al portapapeles');
+            } else {
+              showError((res && res.message) || 'Error al generar el enlace');
+            }
+          });
+        });
+      });
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(function() { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  document.getElementById('btnRefreshUsers').addEventListener('click', load);
+  load();
+})();
+</script>

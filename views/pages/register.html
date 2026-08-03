@@ -1,0 +1,175 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="public/media/images/logo g.png" alt="DyT_EG" class="auth-logo-img">
+      </div>
+      <h2 class="auth-title">Crear Cuenta</h2>
+      <p class="auth-subtitle">Regístrate para comenzar a gestionar tus proyectos</p>
+    </div>
+
+    <div id="registerSuccess" class="auth-success" style="display:none;text-align:center;padding:2rem 0;">
+      <i class="ph-fill ph-envelope-simple" style="font-size:3rem;color:var(--accent-primary);display:block;margin:0 auto 1.25rem;"></i>
+      <h2 class="auth-title" style="margin-bottom:0.75rem;">¡Casi listo!</h2>
+      <p class="auth-subtitle" style="line-height:1.7;">Cuenta creada correctamente. Enviamos un enlace de activación a tu correo.<br>Revisa tu bandeja de entrada para poder iniciar sesión.</p>
+      <a href="#/login" class="btn btn-primary btn-full" style="margin-top:1.5rem;">Ir a Iniciar Sesión</a>
+    </div>
+
+    <form id="registerForm" class="auth-form">
+      <div class="form-group">
+        <label class="form-label" for="regName">Nombre completo</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-user form-input-icon"></i>
+          <input type="text" id="regName" name="regName" class="form-input" placeholder="Tu nombre" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="regEmail">Correo electrónico</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-envelope form-input-icon"></i>
+          <input type="email" id="regEmail" name="regEmail" class="form-input" placeholder="tu@email.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="regPassword">Contraseña</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-lock-key form-input-icon"></i>
+          <input type="password" id="regPassword" name="regPassword" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+          <button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)">
+            <i class="ph-light ph-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="regPasswordConfirm">Confirmar contraseña</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-lock-key form-input-icon"></i>
+          <input type="password" id="regPasswordConfirm" name="regPasswordConfirm" class="form-input" placeholder="Repite tu contraseña" required minlength="8">
+          <button type="button" class="password-toggle" onclick="togglePassword('regPasswordConfirm', this)">
+            <i class="ph-light ph-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="registerError" class="auth-error" style="display:none"></div>
+
+      <div class="form-group" style="display:flex;justify-content:center;align-items: center;">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAD-ll4MBRA3lg5Bf" data-theme="dark"></div>
+      </div>
+
+      <label class="form-terms">
+        <input type="checkbox" id="regTerms" class="form-terms-input">
+        <span class="form-terms-box"><i class="ph-light ph-check form-terms-check"></i></span>
+        <span class="form-terms-text">
+          Acepto los
+          <button type="button" class="legal-inline-link" onclick="openLegal('terminos')">Términos y Condiciones</button>
+          y el
+          <button type="button" class="legal-inline-link" onclick="openLegal('privacidad')">Aviso de Privacidad</button>
+        </span>
+      </label>
+
+      <button type="submit" class="btn btn-primary btn-full" id="registerBtn">
+        <span class="btn-text">Crear Cuenta</span>
+        <span class="btn-loading" style="display:none">
+          <i class="ph-light ph-spinner"></i> Creando cuenta...
+        </span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>¿Ya tienes una cuenta? <a href="#/login" class="auth-link">Inicia sesión</a></p>
+    </div>
+
+    <div class="auth-back">
+      <a href="#/" class="auth-link-sm">
+        <i class="ph-light ph-arrow-left"></i> Volver al inicio
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var form = document.getElementById('registerForm');
+  var btn = document.getElementById('registerBtn');
+  var errorEl = document.getElementById('registerError');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var name = document.getElementById('regName').value.trim();
+    var email = document.getElementById('regEmail').value.trim();
+    var password = document.getElementById('regPassword').value;
+    var confirm = document.getElementById('regPasswordConfirm').value;
+
+    if (!name || !email || !password || !confirm) {
+      showError('Por favor completa todos los campos');
+      return;
+    }
+
+    if (password !== confirm) {
+      showError('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (password.length < 8) {
+      showError('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+
+    var turnstileToken = DyTTurnstile.getToken();
+    if (!turnstileToken) {
+      showError('Completa la verificación de seguridad');
+      return;
+    }
+
+    if (!document.getElementById('regTerms').checked) {
+      showError('Debes aceptar los términos y condiciones y el aviso de privacidad');
+      return;
+    }
+
+    btn.querySelector('.btn-text').style.display = 'none';
+    btn.querySelector('.btn-loading').style.display = 'inline';
+    btn.disabled = true;
+    hideError();
+
+    DyTAuth.register(name, email, password, turnstileToken)
+      .then(function(user) {
+        document.getElementById('registerForm').style.display = 'none';
+        document.querySelector('.auth-footer').style.display = 'none';
+        document.getElementById('registerSuccess').style.display = 'block';
+        hideError();
+      })
+      .catch(function(err) {
+        showError(err.message || 'Error al crear la cuenta');
+        DyTTurnstile.reset();
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loading').style.display = 'none';
+        btn.disabled = false;
+      });
+  });
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+  }
+
+  function hideError() {
+    errorEl.style.display = 'none';
+  }
+
+  window.togglePassword = function(inputId, btn) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'ph-light ph-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'ph-light ph-eye';
+    }
+  };
+})();
+</script>

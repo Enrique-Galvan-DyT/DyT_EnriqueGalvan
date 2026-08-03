@@ -1,0 +1,162 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Panel <span class="gold-text">Admin</span></h1>
+        <p class="dashboard-subtitle">Vista general del sistema de tickets</p>
+      </div>
+      <a href="#/admin/tickets" class="btn btn-secondary">
+        <i class="ph-light ph-list-dashes"></i> Ver Todos los Tickets
+      </a>
+    </div>
+
+    <div class="admin-stats reveal reveal-delay-1">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="ph-light ph-ticket"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="adminStatTotal">0</span>
+          <span class="stat-card-label">Total Tickets</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--open">
+          <i class="ph-light ph-circle"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="adminStatOpen">0</span>
+          <span class="stat-card-label">Abiertos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--progress">
+          <i class="ph-light ph-clock"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="adminStatProgress">0</span>
+          <span class="stat-card-label">En Progreso</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--resolved">
+          <i class="ph-light ph-check-circle"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="adminStatResolved">0</span>
+          <span class="stat-card-label">Resueltos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-section reveal reveal-delay-2">
+        <div class="dashboard-section-header">
+          <h3>Accesos Rapidos</h3>
+        </div>
+        <div class="quick-actions">
+          <a href="#/admin/tickets" class="quick-action-card">
+            <div class="quick-action-icon">
+              <i class="ph-light ph-ticket"></i>
+            </div>
+            <span class="quick-action-text">Gestionar Tickets</span>
+          </a>
+          <a href="#/admin/academy" class="quick-action-card">
+            <div class="quick-action-icon quick-action-icon--warm">
+              <i class="ph-light ph-chalkboard-teacher"></i>
+            </div>
+            <span class="quick-action-text">Gestionar Academia</span>
+          </a>
+          <a href="#/admin/projects" class="quick-action-card">
+            <div class="quick-action-icon quick-action-icon--rose">
+              <i class="ph-light ph-briefcase"></i>
+            </div>
+            <span class="quick-action-text">Gestionar Proyectos</span>
+          </a>
+          <a href="#/admin/purchases" class="quick-action-card">
+            <div class="quick-action-icon quick-action-icon--warm">
+              <i class="ph-light ph-shopping-cart-simple"></i>
+            </div>
+            <span class="quick-action-text">Compras de Clientes</span>
+          </a>
+          <a href="#/admin/contacts" class="quick-action-card">
+            <div class="quick-action-icon quick-action-icon--secondary">
+              <i class="ph-light ph-envelope-simple"></i>
+            </div>
+            <span class="quick-action-text">Mensajes de Contacto</span>
+          </a>
+          <a href="#/admin/users" class="quick-action-card">
+            <div class="quick-action-icon quick-action-icon--secondary">
+              <i class="ph-light ph-user-check"></i>
+            </div>
+            <span class="quick-action-text">Verificar Cuentas</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="dashboard-section reveal reveal-delay-3">
+        <div class="dashboard-section-header">
+          <h3>Tickets Urgentes</h3>
+          <a href="#/admin/tickets?priority=urgent" class="dashboard-section-link">Ver todos <i class="ph-light ph-arrow-right"></i></a>
+        </div>
+        <div id="urgentTickets" class="ticket-list">
+          <div class="ticket-list-empty">
+            <i class="ph-light ph-check-circle"></i>
+            <p>No hay tickets urgentes</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  getAdminTicketStats().then(function(data) {
+    if (data.total !== undefined) document.getElementById('adminStatTotal').textContent = data.total;
+    if (data.open !== undefined) document.getElementById('adminStatOpen').textContent = data.open;
+    if (data.inProgress !== undefined) document.getElementById('adminStatProgress').textContent = data.inProgress;
+    if (data.resolved !== undefined) document.getElementById('adminStatResolved').textContent = data.resolved;
+  });
+
+  getAdminTickets({ priority: 'urgent', limit: 5 }).then(function(data) {
+    var tickets = data.tickets || data || [];
+    var container = document.getElementById('urgentTickets');
+    if (tickets.length) {
+      container.innerHTML = tickets.map(function(t) {
+        return '<a href="#/tickets/' + t.id + '" class="ticket-list-item">' +
+          '<div class="ticket-list-item-left">' +
+            '<span class="ticket-list-item-title">#' + t.id + ' ' + escapeHtml(t.title) + '</span>' +
+            '<span class="ticket-list-item-date">' + escapeHtml(t.userName || '') + ' - ' + formatDate(t.createdAt) + '</span>' +
+          '</div>' +
+          '<span class="ticket-status badge ticket-status-' + t.status + '">' + statusLabel(t.status) + '</span>' +
+        '</a>';
+      }).join('');
+    }
+  });
+
+  function statusLabel(s) {
+    var map = { open: 'Abierto', in_progress: 'En Progreso', resolved: 'Resuelto', closed: 'Cerrado' };
+    return map[s] || s;
+  }
+
+  function priorityLabel(p) {
+    var map = { low: 'Baja', medium: 'Media', high: 'Alta', urgent: 'Urgente' };
+    return map[p] || p;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+})();
+</script>

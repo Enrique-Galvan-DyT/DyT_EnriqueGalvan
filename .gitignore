@@ -1,0 +1,10 @@
+# IA / tooling
+.opencode/
+.agents/
+skills-lock.json
+AGENTS.md
+CLAUDE.md
+
+# SO
+Thumbs.db
+.DS_Store

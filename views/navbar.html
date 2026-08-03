@@ -1,0 +1,204 @@
+<!-- Navbar - Dark Luxury -->
+<nav class="navbar-luxury">
+  <div class="navbar-inner">
+    <!-- Logo -->
+    <a href="#" class="navbar-logo">
+      <img src="public/media/images/Formato A v4.png" alt="DyT_EG" class="navbar-logo-img">
+    </a>
+
+    <!-- Desktop Nav Links -->
+    <div class="navbar-links">
+      <a href="#/servicios" class="navbar-link">Servicios</a>
+      <a href="#/portafolio" class="navbar-link">Portafolio</a>
+      <a href="#/nosotros" class="navbar-link">Nosotros</a>
+      <a href="#/testimonios" class="navbar-link">Testimonios</a>
+      <a href="#/precios" class="navbar-link">Precios</a>
+      <a href="#/academia" class="navbar-link">Academia</a>
+      <a href="#/contacto" class="navbar-link">Contacto</a>
+    </div>
+
+    <!-- Auth / CTA -->
+    <div class="navbar-actions">
+      <a href="#/login" class="btn-login" id="navLoginBtn">
+        <i class="ph-light ph-sign-in"></i>
+        <span>Iniciar sesión</span>
+      </a>
+      <div class="navbar-user-menu" id="navUserMenu" style="display:none">
+        <button class="navbar-user-btn" id="navUserBtn">
+          <span class="navbar-user-avatar" id="navUserAvatar">U</span>
+          <span class="navbar-user-name" id="navUserName">Usuario</span>
+          <i class="ph-light ph-caret-down"></i>
+        </button>
+        <div class="navbar-dropdown" id="navDropdown">
+          <div class="navbar-dropdown-header" id="navDropdownHeader">
+            <span class="navbar-dropdown-name" id="navDropdownName">Usuario</span>
+            <span class="navbar-dropdown-email" id="navDropdownEmail">user@email.com</span>
+          </div>
+          <div class="navbar-dropdown-divider"></div>
+          <a href="#/dashboard" class="navbar-dropdown-item navbar-client-link">
+            <i class="ph-light ph-squares-four"></i> Dashboard
+          </a>
+          <a href="#/tickets" class="navbar-dropdown-item navbar-client-link">
+            <i class="ph-light ph-ticket"></i> Mis Tickets
+          </a>
+          <a href="#/tickets/new" class="navbar-dropdown-item navbar-client-link">
+            <i class="ph-light ph-plus-circle"></i> Nuevo Ticket
+          </a>
+          <a href="#/admin" class="navbar-dropdown-item navbar-admin-link" id="navAdminLink" style="display:none">
+            <i class="ph-light ph-shield-check"></i> Panel Admin
+          </a>
+          <div class="navbar-dropdown-divider"></div>
+          <button class="navbar-dropdown-item navbar-dropdown-logout" id="navLogoutBtn">
+            <i class="ph-light ph-sign-out"></i> Cerrar Sesión
+          </button>
+        </div>
+      </div>
+      <a href="#/contacto" class="btn btn-primary btn-sm">
+        <span>Cotizar</span>
+      </a>
+    </div>
+
+    <!-- Mobile Hamburger -->
+    <button class="navbar-hamburger" id="navHamburger" aria-label="Menu">
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="navbar-mobile-menu" id="navMobile">
+  <div class="navbar-mobile-inner">
+    <a href="#/servicios" class="navbar-mobile-link">Servicios</a>
+    <a href="#/portafolio" class="navbar-mobile-link">Portafolio</a>
+    <a href="#/nosotros" class="navbar-mobile-link">Nosotros</a>
+    <a href="#/testimonios" class="navbar-mobile-link">Testimonios</a>
+    <a href="#/precios" class="navbar-mobile-link">Precios</a>
+    <a href="#/academia" class="navbar-mobile-link">Academia</a>
+    <a href="#/contacto" class="navbar-mobile-link">Contacto</a>
+    <div class="navbar-mobile-divider"></div>
+    <div class="navbar-mobile-auth" id="navMobileAuth">
+      <a href="#/login" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+        <i class="ph-light ph-sign-in"></i> Iniciar Sesión
+      </a>
+      <a href="#/register" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 0.75rem;">
+        <span>Crear Cuenta</span>
+      </a>
+    </div>
+    <div class="navbar-mobile-auth" id="navMobileUser" style="display:none">
+      <button class="btn btn-secondary" id="navMobileLogout" style="width: 100%; justify-content: center; margin-top: 1rem;">
+        <i class="ph-light ph-sign-out"></i> Cerrar Sesión
+      </button>
+    </div>
+    <a href="#/contacto" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1.5rem;">
+      <span>Cotizar Proyecto</span>
+    </a>
+  </div>
+</div>
+
+
+
+<script>
+(function() {
+  var hamburger = document.getElementById('navHamburger');
+  var mobile = document.getElementById('navMobile');
+  var mobileLinks = document.querySelectorAll('.navbar-mobile-link, .navbar-mobile-menu .btn');
+
+  if (hamburger && mobile) {
+    hamburger.addEventListener('click', function() {
+      hamburger.classList.toggle('active');
+      mobile.classList.toggle('active');
+      document.body.style.overflow = mobile.classList.contains('active') ? 'hidden' : '';
+    });
+
+    mobileLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        hamburger.classList.remove('active');
+        mobile.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+  }
+
+  var loginBtn = document.getElementById('navLoginBtn');
+  var userMenu = document.getElementById('navUserMenu');
+  var userBtn = document.getElementById('navUserBtn');
+  var userDropdown = document.getElementById('navDropdown');
+  var userAvatar = document.getElementById('navUserAvatar');
+  var userName = document.getElementById('navUserName');
+  var dropdownName = document.getElementById('navDropdownName');
+  var dropdownEmail = document.getElementById('navDropdownEmail');
+  var adminLink = document.getElementById('navAdminLink');
+  var logoutBtn = document.getElementById('navLogoutBtn');
+  var mobileAuth = document.getElementById('navMobileAuth');
+  var mobileUser = document.getElementById('navMobileUser');
+  var mobileLogout = document.getElementById('navMobileLogout');
+
+  function updateNavAuth() {
+    var loggedIn = window.DyTAuth && DyTAuth.isLoggedIn();
+    var user = loggedIn ? DyTAuth.getUser() : null;
+    var isAdmin = user && user.role === 'admin';
+    var clientLinks = document.querySelectorAll('.navbar-client-link');
+    var adminLinks = document.querySelectorAll('.navbar-admin-link');
+
+    if (loggedIn && user) {
+      loginBtn.style.display = 'none';
+      userMenu.style.display = 'block';
+      var initial = (user.name || user.email || 'U').charAt(0).toUpperCase();
+      userAvatar.textContent = initial;
+      userName.textContent = user.name || 'Usuario';
+      dropdownName.textContent = user.name || 'Usuario';
+      dropdownEmail.textContent = user.email || '';
+
+      clientLinks.forEach(function (el) {
+        el.style.display = isAdmin ? 'none' : 'flex';
+      });
+      adminLinks.forEach(function (el) {
+        el.style.display = isAdmin ? 'flex' : 'none';
+      });
+
+      if (mobileAuth) mobileAuth.style.display = 'none';
+      if (mobileUser) mobileUser.style.display = 'block';
+    } else {
+      loginBtn.style.display = 'flex';
+      userMenu.style.display = 'none';
+      if (mobileAuth) mobileAuth.style.display = 'block';
+      if (mobileUser) mobileUser.style.display = 'none';
+    }
+  }
+
+  if (userBtn) {
+    userBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      userMenu.classList.toggle('open');
+    });
+  }
+
+  document.addEventListener('click', function() {
+    if (userMenu) userMenu.classList.remove('open');
+  });
+
+  if (userDropdown) {
+    userDropdown.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function() {
+      if (window.DyTAuth) DyTAuth.logout();
+    });
+  }
+
+  if (mobileLogout) {
+    mobileLogout.addEventListener('click', function() {
+      if (window.DyTAuth) DyTAuth.logout();
+    });
+  }
+
+  document.addEventListener('auth:changed', updateNavAuth);
+  window.addEventListener('hashchange', updateNavAuth);
+
+  updateNavAuth();
+})();
+</script>

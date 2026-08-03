@@ -1,0 +1,59 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="public/media/images/logo g.png" alt="DyT_EG" class="auth-logo-img">
+      </div>
+      <h2 class="auth-title">Verificando cuenta</h2>
+      <p class="auth-subtitle" id="verifyStatus">Validando tu enlace...</p>
+    </div>
+
+    <div id="verifyResult" style="text-align:center;padding:1rem 0;">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <div class="auth-back">
+      <a href="#/" class="auth-link-sm">
+        <i class="ph-light ph-arrow-left"></i> Volver al inicio
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var hash = window.location.hash || '';
+  var parts = hash.replace('#/', '').split('/');
+  var token = decodeURIComponent(parts[1] || '');
+
+  var statusEl = document.getElementById('verifyStatus');
+  var resultEl = document.getElementById('verifyResult');
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  if (!token) {
+    statusEl.textContent = 'Enlace invalido';
+    resultEl.innerHTML =
+      '<p style="color:var(--text-secondary);margin-bottom:1.5rem;">El enlace de verificacion no es valido.</p>' +
+      '<a href="#/register" class="btn btn-primary">Crear cuenta</a>';
+    return;
+  }
+
+  authVerify(token).then(function(res) {
+    var ok = res && res.success;
+    var msg = (res && res.message) || (ok ? 'Cuenta verificada.' : 'No se pudo verificar tu cuenta.');
+    statusEl.textContent = ok ? 'Listo' : 'Error';
+    resultEl.innerHTML =
+      '<i class="ph-fill ' + (ok ? 'ph-check-circle' : 'ph-warning-circle') + '" style="font-size:3rem;color:' + (ok ? '#4CAF50' : 'var(--accent-warm)') + ';display:block;margin:1rem auto;"></i>' +
+      '<p style="color:var(--text-secondary);line-height:1.7;margin-bottom:1.5rem;">' + escapeHtml(msg) + '</p>' +
+      '<a href="#/login" class="btn btn-primary">Ir a Iniciar Sesion</a>';
+    if (ok) {
+      setTimeout(function() { window.location.hash = '#/login'; }, 3500);
+    }
+  });
+})();
+</script>

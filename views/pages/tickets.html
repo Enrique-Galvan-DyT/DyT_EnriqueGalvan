@@ -1,0 +1,168 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Mis <span class="gold-text">Tickets</span></h1>
+        <p class="dashboard-subtitle">Gestiona y da seguimiento a tus solicitudes</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <a href="#/dashboard" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> Dashboard
+        </a>
+        <a href="#/tickets/new" class="btn btn-primary">
+          <i class="ph-light ph-plus"></i> Nuevo Ticket
+        </a>
+      </div>
+    </div>
+
+    <div class="tickets-filters reveal reveal-delay-1">
+      <div class="tickets-filter-group">
+        <label class="form-label">Estado</label>
+        <select id="filterStatus" class="form-select">
+          <option value="">Todos</option>
+          <option value="open">Abierto</option>
+          <option value="in_progress">En Progreso</option>
+          <option value="resolved">Resuelto</option>
+          <option value="closed">Cerrado</option>
+        </select>
+      </div>
+      <div class="tickets-filter-group">
+        <label class="form-label">Categoria</label>
+        <select id="filterCategory" class="form-select">
+          <option value="">Todas</option>
+          <option value="incident">Incidente</option>
+          <option value="improvement">Mejora</option>
+          <option value="support">Soporte</option>
+          <option value="other">Otro</option>
+        </select>
+      </div>
+      <div class="tickets-filter-group">
+        <label class="form-label">Prioridad</label>
+        <select id="filterPriority" class="form-select">
+          <option value="">Todas</option>
+          <option value="low">Baja</option>
+          <option value="medium">Media</option>
+          <option value="high">Alta</option>
+          <option value="urgent">Urgente</option>
+        </select>
+      </div>
+      <div class="tickets-filter-group tickets-filter-group--search">
+        <label class="form-label">Buscar</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-magnifying-glass form-input-icon"></i>
+          <input type="text" id="filterSearch" class="form-input" placeholder="Buscar tickets...">
+        </div>
+      </div>
+    </div>
+
+    <div id="ticketsList" class="tickets-container reveal reveal-delay-2">
+      <div class="tickets-loading">
+        <div>
+            <div>
+              <i class="ph-light ph-spinner"></i> 
+            </div>
+            <div>
+              <span>Cargando tickets...</span>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var allTickets = [];
+
+  function loadTickets() {
+    var filters = {};
+    var status = document.getElementById('filterStatus').value;
+    var category = document.getElementById('filterCategory').value;
+    var priority = document.getElementById('filterPriority').value;
+    var search = document.getElementById('filterSearch').value.trim();
+
+    if (status) filters.status = status;
+    if (category) filters.category = category;
+    if (priority) filters.priority = priority;
+    if (search) filters.search = search;
+
+    getUserTickets(filters).then(function(data) {
+      allTickets = data.tickets || data || [];
+      renderTickets(allTickets);
+    });
+  }
+
+  function renderTickets(tickets) {
+    var container = document.getElementById('ticketsList');
+    if (!tickets.length) {
+      container.innerHTML =
+        '<div class="tickets-empty">' +
+          '<i class="ph-light ph-ticket"></i>' +
+          '<h3>No se encontraron tickets</h3>' +
+          '<p>Crea tu primer ticket para comenzar</p>' +
+          '<a href="#/tickets/new" class="btn btn-primary btn-sm">Crear Ticket</a>' +
+        '</div>';
+      return;
+    }
+
+    container.innerHTML = tickets.map(function(t) {
+      return '<a href="#/tickets/' + t.id + '" class="ticket-card">' +
+        '<div class="ticket-card-header">' +
+          '<span class="ticket-card-id">#' + t.id + '</span>' +
+          '<span class="ticket-status badge ticket-status-' + t.status + '">' + statusLabel(t.status) + '</span>' +
+        '</div>' +
+        '<h4 class="ticket-card-title">' + escapeHtml(t.title) + '</h4>' +
+        '<p class="ticket-card-desc">' + escapeHtml(t.description || '').substring(0, 120) + '</p>' +
+        '<div class="ticket-card-footer">' +
+          '<div class="ticket-card-tags">' +
+            '<span class="badge ticket-priority-' + t.priority + '">' + priorityLabel(t.priority) + '</span>' +
+            '<span class="badge badge-secondary">' + categoryLabel(t.category) + '</span>' +
+            (t.projectName ? '<span class="badge badge-rose"><i class="ph-light ph-briefcase"></i> ' + escapeHtml(t.projectName) + '</span>' : '') +
+          '</div>' +
+          '<span class="ticket-card-date">' + formatDate(t.createdAt) + '</span>' +
+        '</div>' +
+      '</a>';
+    }).join('');
+  }
+
+  function statusLabel(s) {
+    var map = { open: 'Abierto', in_progress: 'En Progreso', resolved: 'Resuelto', closed: 'Cerrado' };
+    return map[s] || s;
+  }
+
+  function priorityLabel(p) {
+    var map = { low: 'Baja', medium: 'Media', high: 'Alta', urgent: 'Urgente' };
+    return map[p] || p;
+  }
+
+  function categoryLabel(c) {
+    var map = { incident: 'Incidente', improvement: 'Mejora', support: 'Soporte', other: 'Otro' };
+    return map[c] || c;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  document.getElementById('filterStatus').addEventListener('change', loadTickets);
+  document.getElementById('filterCategory').addEventListener('change', loadTickets);
+  document.getElementById('filterPriority').addEventListener('change', loadTickets);
+
+  var searchTimeout;
+  document.getElementById('filterSearch').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(loadTickets, 300);
+  });
+
+  loadTickets();
+})();
+</script>

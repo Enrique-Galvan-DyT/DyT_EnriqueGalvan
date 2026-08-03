@@ -1,0 +1,984 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Administrar <span class="gold-text">Academia</span></h1>
+        <p class="dashboard-subtitle">Gestiona los recursos de venta</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <a href="#/admin" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> Volver
+        </a>
+        <button class="btn btn-primary" id="btnCreateResource">
+          <i class="ph-light ph-plus"></i> Nuevo Recurso
+        </button>
+      </div>
+    </div>
+
+    <div class="dashboard-stats reveal reveal-delay-1">
+      <div class="stat-card">
+        <div class="stat-card-icon"><i class="ph-light ph-video"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statVideos">0</span>
+          <span class="stat-card-label">Videos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--progress"><i class="ph-light ph-book-bookmark"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statGuias">0</span>
+          <span class="stat-card-label">Guias</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--open"><i class="ph-light ph-chalkboard-teacher"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statCursos">0</span>
+          <span class="stat-card-label">Cursos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--resolved"><i class="ph-light ph-package"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statPlantillas">0</span>
+          <span class="stat-card-label">Plantillas</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--progress"><i class="ph-light ph-currency-circle-dollar"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statPlanes">0</span>
+          <span class="stat-card-label">Planes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-section reveal reveal-delay-2" style="margin-top:1.5rem;">
+      <div class="dashboard-section-header" style="flex-wrap:wrap;gap:0.75rem;">
+        <h3>Recursos</h3>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn btn-sm btn-secondary filter-btn active" data-filter="all">Todos</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="video">Videos</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="guia">Guias</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="curso">Cursos</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="plantilla">Plantillas</button>
+          <button class="btn btn-sm btn-secondary filter-btn" data-filter="plan">Planes</button>
+        </div>
+      </div>
+      <div id="academyResourcesList" class="academy-resources-list">
+        <div class="academy-list-empty">
+          <i class="ph-light ph-chalkboard-teacher"></i>
+          <p>Cargando recursos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="academyModal" class="academy-modal-overlay" style="display:none;">
+    <div class="academy-modal-card">
+      <div class="academy-modal-header">
+        <h3 id="modalTitle">Nuevo Recurso</h3>
+        <button class="academy-modal-close" id="btnCloseModal"><i class="ph-light ph-x"></i></button>
+      </div>
+      <form id="academyForm" class="academy-modal-body">
+        <input type="hidden" id="formId">
+
+        <div class="form-group">
+          <label class="form-label" for="formCategory">Categoria</label>
+          <select id="formCategory" class="form-input" required>
+            <option value="">Selecciona...</option>
+            <option value="video">Videos</option>
+            <option value="guia">Guias</option>
+            <option value="curso">Cursos</option>
+            <option value="plantilla">Plantillas</option>
+            <option value="plan">Planes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="formTitle">Titulo</label>
+          <input type="text" id="formTitle" class="form-input" placeholder="Titulo del recurso" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="formDescription">Descripcion</label>
+          <textarea id="formDescription" class="form-input" rows="3" placeholder="Descripcion del recurso" required></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" for="formPrice">Precio (MXN)</label>
+            <input type="number" id="formPrice" class="form-input" min="0" step="1" placeholder="0.00" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formDuration">Duracion</label>
+            <input type="text" id="formDuration" class="form-input" placeholder="ej. 2 horas, PDF, Descarga" required>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" for="formLevel">Nivel</label>
+            <select id="formLevel" class="form-input" required>
+              <option value="">Selecciona...</option>
+              <option value="Basico">Basico</option>
+              <option value="Intermedio">Intermedio</option>
+              <option value="Avanzado">Avanzado</option>
+              <option value="Todos los niveles">Todos</option>
+              <option value="Estandar">Estandar</option>
+              <option value="Premium">Premium</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formAvailable">Disponible</label>
+            <select id="formAvailable" class="form-input" required>
+              <option value="true">Si</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Content Files (all categories) -->
+        <div class="form-group">
+          <label class="form-label">Archivos e imagenes</label>
+          <div class="content-files-list" id="contentFilesList"></div>
+          <label class="media-upload-label media-upload-label--small">
+            <i class="ph-light ph-paperclip"></i>
+            <span>Agregar archivo</span>
+            <input type="file" id="formFileUpload" accept="image/jpeg,image/png,image/webp,image/gif,.pdf,.doc,.docx,.xls,.xlsx,.zip,.txt,video/mp4,video/webm,video/ogg" style="display:none;">
+          </label>
+          <span class="form-hint">Imagenes, PDFs, documentos y videos (mp4/webm/ogg). Los videos de recursos de paga se guardan en la API y solo se sirven por ella. Maximo 200 MB.</span>
+          <div id="fileUploadProgress" class="media-progress" style="display:none;">
+            <div class="media-progress-bar"><div class="media-progress-fill"></div></div>
+            <span class="media-progress-text">Subiendo...</span>
+          </div>
+        </div>
+
+        <!-- Video URL (video + curso) -->
+        <div class="form-group media-section" data-show="video,curso">
+          <label class="form-label" for="formVideoUrl">URL del video principal</label>
+          <input type="url" id="formVideoUrl" class="form-input" placeholder="https://youtube.com/watch?v=... o https://vimeo.com/...">
+          <span class="form-hint">Pega el enlace de YouTube o Vimeo</span>
+        </div>
+
+        <!-- Lessons (curso) -->
+        <div class="form-group media-section" data-show="curso">
+          <label class="form-label">Lecciones del curso</label>
+          <div class="lessons-list" id="lessonsList"></div>
+          <button type="button" class="btn btn-sm btn-secondary" id="btnAddLesson" style="margin-top:0.5rem;">
+            <i class="ph-light ph-plus"></i> Agregar leccion
+          </button>
+        </div>
+
+        <!-- Lesson Form (inline) -->
+        <div id="lessonFormPanel" class="lesson-form-panel" style="display:none;">
+          <div class="lesson-form-header">
+            <h4 id="lessonFormTitle">Nueva leccion</h4>
+            <button type="button" class="academy-modal-close" id="btnCancelLesson"><i class="ph-light ph-x"></i></button>
+          </div>
+          <input type="hidden" id="lessonFormIndex" value="-1">
+          <div class="form-group">
+            <label class="form-label" for="lessonTitle">Titulo</label>
+            <input type="text" id="lessonTitle" class="form-input" placeholder="Titulo de la leccion">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lessonDescription">Descripcion</label>
+            <textarea id="lessonDescription" class="form-input" rows="2" placeholder="Descripcion breve"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lessonVideoUrl">URL del video</label>
+            <input type="url" id="lessonVideoUrl" class="form-input" placeholder="https://youtube.com/watch?v=...">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="lessonDuration">Duracion</label>
+              <input type="text" id="lessonDuration" class="form-input" placeholder="ej. 15 min">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lessonSortOrder">Orden</label>
+              <input type="number" id="lessonSortOrder" class="form-input" min="0" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lessonIsFree">
+              <input type="checkbox" id="lessonIsFree" style="margin-right:0.5rem;"> Leccion gratuita (preview)
+            </label>
+          </div>
+          <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+            <button type="button" class="btn btn-sm btn-secondary" id="btnSaveLesson">Guardar leccion</button>
+          </div>
+        </div>
+
+        <!-- Body Content (CKEditor) -->
+        <div class="form-group">
+          <label class="form-label">Contenido principal</label>
+          <span class="form-hint" style="display:block;margin-bottom:0.5rem;">Usa <code>{{file:N}}</code> para insertar un archivo donde N es su posicion (0, 1, 2...)</span>
+          <textarea id="formBodyHtml" rows="12"></textarea>
+        </div>
+
+        <div id="formError" class="auth-error" style="display:none"></div>
+
+        <div class="academy-modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveResource">
+            <span class="btn-text">Guardar</span>
+            <span class="btn-loading" style="display:none"><i class="ph-light ph-spinner"></i> Guardando...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="academy-modal-overlay" style="display:none;">
+    <div class="academy-modal-card">
+      <div class="academy-modal-header">
+        <h3 id="confirmTitle">Confirmar</h3>
+        <button class="academy-modal-close" id="btnConfirmClose"><i class="ph-light ph-x"></i></button>
+      </div>
+      <div class="academy-modal-body">
+        <p id="confirmMessage" style="margin:0;color:var(--text-secondary);">¿Estás seguro?</p>
+      </div>
+      <div class="academy-modal-footer">
+        <button class="btn btn-secondary" id="btnConfirmCancel">Cancelar</button>
+        <button class="btn btn-primary" id="btnConfirmAccept">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var currentFilter = 'all';
+  var allResources = [];
+  var modal = document.getElementById('academyModal');
+  var form = document.getElementById('academyForm');
+  var formError = document.getElementById('formError');
+
+  // --- Media state ---
+  var currentFiles = [];
+  var currentLessons = [];
+  var editingResourceId = null;
+  var thumbnailIndex = -1;
+  var originalContentIds = [];
+  var originalThumbnailId = null;
+
+  function loadResources() {
+    getAcademyResources().then(function(data) {
+      allResources = data || [];
+      updateStats();
+      renderList();
+    });
+  }
+
+  function updateStats() {
+    var counts = { video: 0, guia: 0, curso: 0, plantilla: 0, plan: 0 };
+    allResources.forEach(function(r) {
+      var cat = r.category || r.Category;
+      if (counts[cat] !== undefined) counts[cat]++;
+    });
+    document.getElementById('statVideos').textContent = counts.video;
+    document.getElementById('statGuias').textContent = counts.guia;
+    document.getElementById('statCursos').textContent = counts.curso;
+    document.getElementById('statPlantillas').textContent = counts.plantilla;
+    document.getElementById('statPlanes').textContent = counts.plan;
+  }
+
+  function renderList() {
+    var container = document.getElementById('academyResourcesList');
+    var filtered = currentFilter === 'all'
+      ? allResources
+      : allResources.filter(function(r) { return (r.category || r.Category) === currentFilter; });
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="academy-list-empty"><i class="ph-light ph-chalkboard-teacher"></i><p>No hay recursos</p></div>';
+      return;
+    }
+
+    var levelLabels = { basico: 'Basico', intermedio: 'Intermedio', avanzado: 'Avanzado', 'todos los niveles': 'Todos' };
+    var levelBadgeClass = { basico: 'basic', intermedio: 'intermediate', avanzado: 'advanced', 'todos los niveles': 'all' };
+
+    container.innerHTML = filtered.map(function(r) {
+      var id = r.id || r.Id_AcademyResource;
+      var title = r.title || r.Title;
+      var desc = r.description || r.Resource_Description || '';
+      var price = r.price || r.Price || 0;
+      var duration = r.duration || r.Duration || '';
+      var level = r.level || r.Resource_Level || '';
+      var available = r.isAvailable !== undefined ? r.isAvailable : (r.IsAvailable !== undefined ? r.IsAvailable : true);
+      var badgeClass = 'academia-badge--' + (levelBadgeClass[level.toLowerCase()] || 'all');
+      var unavailableClass = available ? '' : ' academy-resource-item--unavailable';
+
+      var contentCount = r.content ? r.content.length : 0;
+      var lessonCount = r.lessons ? r.lessons.length : 0;
+      var mediaInfo = '';
+      if (contentCount > 0) mediaInfo += '<span class="academia-duration"><i class="ph-light ph-paperclip"></i> ' + contentCount + ' archivos</span>';
+      if (lessonCount > 0) mediaInfo += '<span class="academia-duration"><i class="ph-light ph-list"></i> ' + lessonCount + ' lecciones</span>';
+
+      return '<div class="academy-resource-item' + unavailableClass + '" data-id="' + id + '">' +
+        '<div class="academy-resource-left">' +
+          '<span class="academy-resource-title">' + escapeHtml(title) + '</span>' +
+          '<p class="academy-resource-desc">' + escapeHtml(desc) + '</p>' +
+          '<div class="academy-resource-meta">' +
+            '<span class="academia-badge ' + badgeClass + '">' + (levelLabels[level] || level) + '</span>' +
+            '<span class="academia-duration"><i class="ph-light ph-clock"></i> ' + escapeHtml(duration) + '</span>' +
+            mediaInfo +
+          '</div>' +
+        '</div>' +
+        '<div class="academy-resource-right">' +
+          '<span class="academy-resource-price">$' + Number(price).toLocaleString('es-MX') + '</span>' +
+          '<div class="academy-resource-actions">' +
+            '<button onclick="academyCRUD.edit(' + id + ')"><i class="ph-light ph-pencil-simple"></i></button>' +
+            '<button class="btn-delete" onclick="academyCRUD.remove(' + id + ')"><i class="ph-light ph-trash"></i></button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // --- Media sections visibility ---
+  function updateMediaSections() {
+    var cat = document.getElementById('formCategory').value;
+    document.querySelectorAll('.media-section').forEach(function(el) {
+      var show = el.getAttribute('data-show') || '';
+      el.style.display = show.indexOf(cat) !== -1 ? '' : 'none';
+    });
+  }
+
+  // --- Content files (images + documents) ---
+  var fileInput = document.getElementById('formFileUpload');
+  var fileProgress = document.getElementById('fileUploadProgress');
+  var thumbnailIndex = -1;
+
+  var imageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  var videoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+
+  function isImageFile(file) {
+    return imageTypes.indexOf(file.type) !== -1;
+  }
+
+  function isVideoFile(file) {
+    if (videoTypes.indexOf(file.type) !== -1) return true;
+    if (file.name) {
+      var ext = file.name.split('.').pop().toLowerCase();
+      return ['mp4', 'webm', 'ogg', 'mov'].indexOf(ext) !== -1;
+    }
+    return false;
+  }
+
+  function isVideoContent(f) {
+    var ft = f.fileType || '';
+    if (ft.indexOf('video') !== -1) return true;
+    var fn = f.fileName || '';
+    if (fn) {
+      var ext = fn.split('.').pop().toLowerCase();
+      return ['mp4', 'webm', 'ogg', 'mov'].indexOf(ext) !== -1;
+    }
+    return false;
+  }
+
+  fileInput.addEventListener('change', function() {
+    var file = fileInput.files[0];
+    if (!file) return;
+
+    var uploadingImage = isImageFile(file);
+    var uploadingVideo = isVideoFile(file);
+    if (uploadingImage && file.size > 5 * 1024 * 1024) {
+      showError('La imagen no puede superar 5MB');
+      fileInput.value = '';
+      return;
+    }
+    if (uploadingVideo && file.size > 200 * 1024 * 1024) {
+      showError('El video no puede superar 200MB');
+      fileInput.value = '';
+      return;
+    }
+
+    fileProgress.style.display = 'flex';
+    fileProgress.querySelector('.media-progress-fill').style.width = '30%';
+    fileProgress.querySelector('.media-progress-text').textContent = 'Subiendo...';
+
+    var uploadFn = uploadingImage ? uploadImage : uploadDocument;
+    uploadFn(file).then(function(res) {
+      fileProgress.querySelector('.media-progress-fill').style.width = '100%';
+      if (res.success && res.data) {
+        var newFile = {
+          fileName: res.data.fileName || file.name,
+          fileUrl: res.data.url,
+          fileSize: res.data.fileSize || formatFileSize(file.size),
+          fileType: uploadingImage ? (res.data.format || file.type) : (res.data.fileType || file.type),
+          _isNew: true,
+          _isImage: uploadingImage,
+          _isVideo: uploadingVideo
+        };
+        currentFiles.push(newFile);
+        var newIdx = currentFiles.length - 1;
+        if (thumbnailIndex === -1 && uploadingImage) {
+          thumbnailIndex = newIdx;
+          newFile._isThumbnail = true;
+        }
+        renderContentFiles();
+        fileProgress.querySelector('.media-progress-text').textContent = 'Archivo subido';
+        setTimeout(function() { fileProgress.style.display = 'none'; }, 1000);
+      } else {
+        fileProgress.querySelector('.media-progress-text').textContent = 'Error al subir';
+        showError(res.message || 'Error al subir archivo');
+        setTimeout(function() { fileProgress.style.display = 'none'; }, 1500);
+      }
+      fileInput.value = '';
+    });
+  });
+
+  function setThumbnail(idx) {
+    thumbnailIndex = idx;
+    currentFiles.forEach(function(f, i) {
+      f._isThumbnail = (i === idx);
+    });
+    renderContentFiles();
+  }
+
+  function swapFiles(a, b) {
+    var tmp = currentFiles[a];
+    currentFiles[a] = currentFiles[b];
+    currentFiles[b] = tmp;
+    if (thumbnailIndex === a) thumbnailIndex = b;
+    else if (thumbnailIndex === b) thumbnailIndex = a;
+    renderContentFiles();
+  }
+
+  function renderContentFiles() {
+    var container = document.getElementById('contentFilesList');
+    if (!currentFiles.length) {
+      container.innerHTML = '<div class="content-files-empty">No hay archivos. Sube imagenes, PDFs, documentos o videos.</div>';
+      return;
+    }
+    container.innerHTML = currentFiles.map(function(f, i) {
+      var isImage = f._isImage || (f.fileType && f.fileType.indexOf('image') !== -1 && f.fileType !== 'image/thumbnail');
+      var isVideo = f._isVideo || isVideoContent(f);
+      var isThumb = f._isThumbnail || (thumbnailIndex === i);
+      // Non-thumbnail index for placeholder (offset = position among non-thumbnails)
+      var nonThumbIdx = currentFiles.filter(function(x) { return !x._isThumbnail; }).indexOf(f);
+      var placeholderTag = isThumb ? '' : '{{file:' + nonThumbIdx + '}}';
+
+      var icon = 'ph-file-text';
+      if (f.fileType && f.fileType.indexOf('pdf') !== -1) icon = 'ph-file-pdf';
+      else if (f.fileType && f.fileType.indexOf('spreadsheet') !== -1) icon = 'ph-file-spreadsheet';
+      else if (f.fileType && f.fileType.indexOf('word') !== -1) icon = 'ph-file-doc';
+      else if (f.fileType && f.fileType.indexOf('zip') !== -1) icon = 'ph-file-zip';
+      else if (isVideo) icon = 'ph-video';
+      else if (isImage) icon = 'ph-image';
+
+      var imageClass = isImage ? ' content-file-item--image' : '';
+      var thumbClass = isThumb ? ' content-file-item--thumbnail' : '';
+
+      var html = '<div class="content-file-item' + imageClass + thumbClass + '" data-index="' + i + '">';
+
+      if (isImage && f.fileUrl) {
+        html += '<img class="content-file-thumb-preview" src="' + f.fileUrl + '" alt="">';
+      }
+
+      html += '<div class="content-file-info">' +
+        '<i class="ph-light ' + icon + '"></i>' +
+        '<span class="content-file-name">' + escapeHtml(f.fileName) + '</span>' +
+        '<span class="content-file-size">' + escapeHtml(f.fileSize) + '</span>' +
+      '</div>';
+
+      html += '<textarea class="content-file-description" data-index="' + i + '" placeholder="Descripcion del archivo (opcional)" rows="2">' + escapeHtml(f.description || f.Description || '') + '</textarea>';
+
+      html += '<div class="content-file-actions">';
+      html += '<button type="button" class="content-file-move" data-action="move-up" data-index="' + i + '" title="Subir"><i class="ph-light ph-caret-up"></i></button>';
+      html += '<button type="button" class="content-file-move" data-action="move-down" data-index="' + i + '" title="Bajar"><i class="ph-light ph-caret-down"></i></button>';
+      if (!isThumb && placeholderTag) {
+        html += '<button type="button" class="content-file-placeholder" data-placeholder="' + placeholderTag + '" title="Copiar ' + placeholderTag + '"><i class="ph-light ph-link"></i></button>';
+      }
+      if (isImage) {
+        html += '<button type="button" class="content-file-thumb' + (isThumb ? ' active' : '') + '" data-action="thumb" data-index="' + i + '" title="Usar como portada"><i class="ph-light ph-star' + (isThumb ? '-fill' : '') + '"></i></button>';
+      }
+      html += '<button type="button" class="content-file-remove" data-action="remove" data-index="' + i + '"><i class="ph-light ph-trash"></i></button>';
+      html += '</div>';
+      html += '</div>';
+      return html;
+    }).join('');
+
+    container.querySelectorAll('[data-action="thumb"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        setThumbnail(idx);
+      });
+    });
+
+    container.querySelectorAll('[data-action="move-up"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        if (idx > 0) {
+          swapFiles(idx, idx - 1);
+        }
+      });
+    });
+
+    container.querySelectorAll('[data-action="move-down"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        if (idx < currentFiles.length - 1) {
+          swapFiles(idx, idx + 1);
+        }
+      });
+    });
+
+    container.querySelectorAll('.content-file-placeholder').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var tag = btn.getAttribute('data-placeholder');
+        if (tag) {
+          navigator.clipboard.writeText(tag).then(function() {
+            showError('Placeholder ' + tag + ' copiado al portapapeles');
+          }).catch(function() {
+            // Fallback for older browsers
+            var ta = document.createElement('textarea');
+            ta.value = tag;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showError('Placeholder ' + tag + ' copiado');
+          });
+        }
+      });
+    });
+
+    container.querySelectorAll('[data-action="remove"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        currentFiles.splice(idx, 1);
+        if (thumbnailIndex === idx) {
+          thumbnailIndex = -1;
+          for (var j = 0; j < currentFiles.length; j++) {
+            var isImg = currentFiles[j]._isImage || (currentFiles[j].fileType && currentFiles[j].fileType.indexOf('image') !== -1 && currentFiles[j].fileType !== 'image/thumbnail');
+            if (isImg) {
+              thumbnailIndex = j;
+              currentFiles[j]._isThumbnail = true;
+              break;
+            }
+          }
+        } else if (thumbnailIndex > idx) {
+          thumbnailIndex--;
+        }
+        renderContentFiles();
+      });
+    });
+
+    container.querySelectorAll('.content-file-description').forEach(function(ta) {
+      ta.addEventListener('input', function() {
+        var idx = parseInt(ta.getAttribute('data-index'));
+        if (currentFiles[idx]) {
+          currentFiles[idx].description = ta.value;
+        }
+      });
+    });
+  }
+
+  // --- Lessons ---
+  var lessonFormPanel = document.getElementById('lessonFormPanel');
+  var editingLessonIndex = -1;
+
+  document.getElementById('btnAddLesson').addEventListener('click', function() {
+    editingLessonIndex = -1;
+    document.getElementById('lessonFormTitle').textContent = 'Nueva leccion';
+    document.getElementById('lessonFormIndex').value = '-1';
+    document.getElementById('lessonTitle').value = '';
+    document.getElementById('lessonDescription').value = '';
+    document.getElementById('lessonVideoUrl').value = '';
+    document.getElementById('lessonDuration').value = '';
+    document.getElementById('lessonSortOrder').value = currentLessons.length;
+    document.getElementById('lessonIsFree').checked = false;
+    lessonFormPanel.style.display = 'block';
+  });
+
+  document.getElementById('btnCancelLesson').addEventListener('click', function() {
+    lessonFormPanel.style.display = 'none';
+  });
+
+  document.getElementById('btnSaveLesson').addEventListener('click', function() {
+    var title = document.getElementById('lessonTitle').value.trim();
+    if (!title) {
+      showError('El titulo es requerido');
+      return;
+    }
+
+    var lessonData = {
+      title: title,
+      description: document.getElementById('lessonDescription').value.trim(),
+      videoUrl: document.getElementById('lessonVideoUrl').value.trim(),
+      duration: document.getElementById('lessonDuration').value.trim(),
+      sortOrder: parseInt(document.getElementById('lessonSortOrder').value) || 0,
+      isFree: document.getElementById('lessonIsFree').checked
+    };
+
+    var idx = parseInt(document.getElementById('lessonFormIndex').value);
+    if (idx >= 0) {
+      currentLessons[idx] = lessonData;
+    } else {
+      currentLessons.push(lessonData);
+    }
+
+    renderLessons();
+    lessonFormPanel.style.display = 'none';
+  });
+
+  function renderLessons() {
+    var container = document.getElementById('lessonsList');
+    if (!currentLessons.length) {
+      container.innerHTML = '';
+      return;
+    }
+    container.innerHTML = currentLessons.map(function(l, i) {
+      var freeBadge = l.isFree ? '<span class="free-badge">Gratis</span>' : '';
+      var duration = l.duration ? '<span><i class="ph-light ph-clock"></i> ' + escapeHtml(l.duration) + '</span>' : '';
+      var hasVideo = l.videoUrl ? '<span><i class="ph-light ph-video"></i> Video</span>' : '';
+
+      return '<div class="lesson-item">' +
+        '<div class="lesson-item-info">' +
+          '<span class="lesson-item-title">' + (i + 1) + '. ' + escapeHtml(l.title) + '</span>' +
+          '<div class="lesson-item-meta">' +
+            freeBadge +
+            duration +
+            hasVideo +
+          '</div>' +
+        '</div>' +
+        '<div class="lesson-item-actions">' +
+          '<button type="button" data-action="edit" data-index="' + i + '"><i class="ph-light ph-pencil-simple"></i></button>' +
+          '<button type="button" class="btn-delete" data-action="delete" data-index="' + i + '"><i class="ph-light ph-trash"></i></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    container.querySelectorAll('[data-action="edit"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        var l = currentLessons[idx];
+        editingLessonIndex = idx;
+        document.getElementById('lessonFormTitle').textContent = 'Editar leccion';
+        document.getElementById('lessonFormIndex').value = idx;
+        document.getElementById('lessonTitle').value = l.title || '';
+        document.getElementById('lessonDescription').value = l.description || '';
+        document.getElementById('lessonVideoUrl').value = l.videoUrl || '';
+        document.getElementById('lessonDuration').value = l.duration || '';
+        document.getElementById('lessonSortOrder').value = l.sortOrder || 0;
+        document.getElementById('lessonIsFree').checked = l.isFree || false;
+        lessonFormPanel.style.display = 'block';
+      });
+    });
+
+    container.querySelectorAll('[data-action="delete"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        currentLessons.splice(idx, 1);
+        renderLessons();
+      });
+    });
+  }
+
+  // --- Modal open/close ---
+  function openModal(data) {
+    form.reset();
+    formError.style.display = 'none';
+    document.getElementById('formId').value = '';
+    document.getElementById('modalTitle').textContent = 'Nuevo Recurso';
+    currentFiles = [];
+    currentLessons = [];
+    editingResourceId = null;
+    thumbnailIndex = -1;
+    originalContentIds = [];
+    originalThumbnailId = null;
+    lessonFormPanel.style.display = 'none';
+    renderContentFiles();
+    renderLessons();
+
+    if (data) {
+      var id = data.Id_AcademyResource || data.id;
+      editingResourceId = id;
+      document.getElementById('formId').value = id;
+      document.getElementById('formCategory').value = data.Category || data.category || '';
+      document.getElementById('formTitle').value = data.Title || data.title || '';
+      document.getElementById('formDescription').value = data.Resource_Description || data.description || '';
+      document.getElementById('formPrice').value = data.Price || data.price || '';
+      document.getElementById('formDuration').value = data.Duration || data.duration || '';
+      document.getElementById('formLevel').value = data.Resource_Level || data.level || '';
+      document.getElementById('formAvailable').value = (data.isAvailable !== undefined ? data.isAvailable : (data.IsAvailable !== undefined ? data.IsAvailable : true)).toString();
+      document.getElementById('formVideoUrl').value = data.videoUrl || data.VideoUrl || '';
+      document.getElementById('modalTitle').textContent = 'Editar Recurso';
+
+      // Load existing content files and detect thumbnail
+      if (data.content && data.content.length) {
+        var thumbFound = false;
+        data.content.forEach(function(c) {
+          var cFileType = c.fileType || c.FileType || '';
+          var cFileName = c.fileName || c.FileName || '';
+          var isThumb = cFileType === 'image/thumbnail' || cFileName === '_thumbnail_';
+          var cid = c.id || c.Id_AcademyContent;
+          originalContentIds.push(cid);
+          if (isThumb) {
+            originalThumbnailId = cid;
+          }
+
+          if (isThumb) {
+            thumbnailIndex = currentFiles.length;
+            thumbFound = true;
+            currentFiles.push({
+              id: c.id || c.Id_AcademyContent,
+              fileName: c.fileName || c.FileName,
+              fileUrl: c.fileUrl || c.FileUrl,
+              fileSize: c.fileSize || c.FileSize,
+              fileType: c.fileType || c.FileType,
+              description: c.description || c.Description || '',
+              _existing: true,
+              _isImage: cFileType.indexOf('image') !== -1 || isImageByExtension(cFileName),
+              _isThumbnail: true
+            });
+          } else {
+            var isImg = cFileType.indexOf('image') !== -1 || isImageByExtension(cFileName);
+            currentFiles.push({
+              id: c.id || c.Id_AcademyContent,
+              fileName: c.fileName || c.FileName,
+              fileUrl: c.fileUrl || c.FileUrl,
+              fileSize: c.fileSize || c.FileSize,
+              fileType: c.fileType || c.FileType,
+              description: c.description || c.Description || '',
+              _existing: true,
+              _isImage: isImg,
+              _isThumbnail: false
+            });
+          }
+        });
+        renderContentFiles();
+      }
+
+      // Load existing lessons
+      if (data.lessons && data.lessons.length) {
+        currentLessons = data.lessons.map(function(l) {
+          return {
+            id: l.id || l.Id_ActivityLesson,
+            title: l.title || l.Title,
+            description: l.description || l.Description,
+            videoUrl: l.videoUrl || l.VideoUrl,
+            duration: l.duration || l.Duration,
+            sortOrder: l.sortOrder || l.SortOrder || 0,
+            isFree: l.isFree || l.IsFree || false
+          };
+        });
+        renderLessons();
+      }
+
+      // Set BodyHtml for CKEditor
+      var bodyHtml = data.bodyHtml || data.BodyHtml || '';
+      document.getElementById('formBodyHtml').value = bodyHtml;
+    }
+
+    // Init CKEditor
+    if (typeof CKEDITOR !== 'undefined') {
+      if (CKEDITOR.instances.formBodyHtml) {
+        CKEDITOR.instances.formBodyHtml.destroy();
+      }
+      CKEDITOR.replace('formBodyHtml', {
+        height: 400,
+        removePlugins: 'flash,iframe,forms,newpage,print,preview,templates',
+        toolbar: [
+          { name: 'basicstyles', items: ['Bold','Italic','Underline','Strike','Subscript','Superscript','RemoveFormat','CopyFormatting'] },
+          { name: 'paragraph', items: ['NumberedList','BulletedList','Outdent','Indent','IndentBlock','Blockquote','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'] },
+          { name: 'colors', items: ['TextColor','BGColor'] },
+          { name: 'links', items: ['Link','Unlink'] },
+          { name: 'insert', items: ['Table','HorizontalRule','SpecialChar'] },
+          { name: 'styles', items: ['Format','Font','FontSize'] },
+          { name: 'tools', items: ['Maximize','Source','ShowBlocks'] }
+        ],
+        contentsCss: '/public/css/ckeditor-contents.css',
+        bodyClass: 'ckeditor-body',
+        font_names: 'Arial/Arial, Helvetica, sans-serif;Comic Sans MS/Comic Sans MS, cursive;Courier New/Courier New, Courier, monospace;Georgia/Georgia, serif;Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;Tahoma/Tahoma, Geneva, sans-serif;Times New Roman/Times New Roman, Times, serif;Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;Verdana/Verdana, Geneva, sans-serif',
+        font_defaultLabel: 'Arial',
+        fontSize_defaultLabel: '14',
+        fontSize_sizes: '8/8px;9/9px;10/10px;11/11px;12/12px;13/13px;14/14px;15/15px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;42/42px;48/48px;60/60px;72/72px',
+        format_tags: 'p;h1;h2;h3;h4;h5;h6;pre;div',
+        resize_enabled: true,
+        allowedContent: true
+      });
+    }
+
+    updateMediaSections();
+    modal.style.display = 'flex';
+  }
+
+  function isImageByExtension(fileName) {
+    if (!fileName) return false;
+    var ext = fileName.split('.').pop().toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].indexOf(ext) !== -1;
+  }
+
+  function closeModal() {
+    if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.formBodyHtml) {
+      CKEDITOR.instances.formBodyHtml.destroy();
+    }
+    modal.style.display = 'none';
+  }
+
+  // --- Form submit ---
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var id = document.getElementById('formId').value;
+    var payload = {
+      Category: document.getElementById('formCategory').value,
+      Title: document.getElementById('formTitle').value,
+      Resource_Description: document.getElementById('formDescription').value,
+      Price: parseFloat(document.getElementById('formPrice').value),
+      Duration: document.getElementById('formDuration').value,
+      Resource_Level: document.getElementById('formLevel').value,
+      IsAvailable: document.getElementById('formAvailable').value === 'true',
+      BodyHtml: (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.formBodyHtml)
+        ? CKEDITOR.instances.formBodyHtml.getData()
+        : document.getElementById('formBodyHtml').value
+    };
+
+    var btn = document.getElementById('btnSaveResource');
+    btn.querySelector('.btn-text').style.display = 'none';
+    btn.querySelector('.btn-loading').style.display = 'inline';
+    btn.disabled = true;
+
+    var promise = id ? updateAcademyResource(id, payload) : createAcademyResource(payload);
+    promise.then(function(res) {
+      if (res.success === false) {
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loading').style.display = 'none';
+        btn.disabled = false;
+        formError.textContent = res.message;
+        formError.style.display = 'block';
+        return;
+      }
+
+      var resourceId = id || (res.data ? (res.data.id || res.data.Id_AcademyResource) : null);
+      if (!resourceId) {
+        closeModal();
+        loadResources();
+        return;
+      }
+
+      // 1) Delete ALL existing content items so they can be recreated with updated descriptions
+      var deletePromises = [];
+      originalContentIds.forEach(function(oid) {
+        deletePromises.push(deleteContent(oid));
+      });
+
+      Promise.all(deletePromises).then(function() {
+        // 2) Save thumbnail (with its description)
+        var filePromises = [];
+        if (thumbnailIndex >= 0 && currentFiles[thumbnailIndex]) {
+          var thumbFile = currentFiles[thumbnailIndex];
+          filePromises.push(addResourceContent(resourceId, {
+            FileName: '_thumbnail_',
+            FileUrl: thumbFile.fileUrl,
+            FileSize: '0',
+            FileType: 'image/thumbnail',
+            Description: thumbFile.description || '',
+            SortOrder: 0
+          }));
+        }
+
+        // 3) Save ALL non-thumbnail files (existing + new, all with current descriptions)
+        currentFiles.filter(function(f) { return !f._isThumbnail; }).forEach(function(f) {
+          var sortIdx = currentFiles.indexOf(f);
+          filePromises.push(addResourceContent(resourceId, {
+            FileName: f.fileName,
+            FileUrl: f.fileUrl,
+            FileSize: f.fileSize,
+            FileType: f.fileType,
+            Description: f.description || '',
+            SortOrder: sortIdx
+          }));
+        });
+
+        return Promise.all(filePromises);
+      }).then(function() {
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loading').style.display = 'none';
+        btn.disabled = false;
+        closeModal();
+        loadResources();
+      });
+    });
+  });
+
+  // --- Category change ---
+  document.getElementById('formCategory').addEventListener('change', updateMediaSections);
+
+  // --- Event listeners ---
+  document.getElementById('btnCreateResource').addEventListener('click', function() { openModal(null); });
+  document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+  document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      renderList();
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  // --- Confirm Modal ---
+  var confirmModal = document.getElementById('confirmModal');
+  var confirmCallback = null;
+
+  function showConfirm(message, callback) {
+    document.getElementById('confirmMessage').textContent = message;
+    confirmCallback = callback;
+    confirmModal.style.display = 'flex';
+  }
+
+  function closeConfirm() {
+    confirmModal.style.display = 'none';
+    confirmCallback = null;
+  }
+
+  document.getElementById('btnConfirmClose').addEventListener('click', closeConfirm);
+  document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
+  confirmModal.addEventListener('click', function(e) {
+    if (e.target === confirmModal) closeConfirm();
+  });
+  document.getElementById('btnConfirmAccept').addEventListener('click', function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+
+  window.academyCRUD = {
+    edit: function(id) {
+      var resource = allResources.find(function(r) { return (r.Id_AcademyResource || r.id) === id; });
+      if (resource) openModal(resource);
+    },
+    remove: function(id) {
+      showConfirm('¿Eliminar este recurso?', function() {
+        deleteAcademyResource(id).then(function(res) {
+          if (res.success !== false) loadResources();
+        });
+      });
+    }
+  };
+
+  loadResources();
+})();
+</script>

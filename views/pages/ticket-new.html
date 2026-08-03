@@ -1,0 +1,150 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Nuevo <span class="gold-text">Ticket</span></h1>
+        <p class="dashboard-subtitle">Describe tu incidente o solicitud de mejora</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <a href="#/tickets" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> Mis Tickets
+        </a>
+      </div>
+    </div>
+
+    <div class="ticket-form-container reveal reveal-delay-1">
+      <form id="newTicketForm" class="ticket-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="ticketCategory">Categoria</label>
+            <select id="ticketCategory" class="form-select" required>
+              <option value="">Seleccionar categoria</option>
+              <option value="incident">Incidente</option>
+              <option value="improvement">Mejora</option>
+              <option value="support">Soporte</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ticketPriority">Prioridad</label>
+            <select id="ticketPriority" class="form-select" required>
+              <option value="">Seleccionar prioridad</option>
+              <option value="low">Baja</option>
+              <option value="medium" selected>Media</option>
+              <option value="high">Alta</option>
+              <option value="urgent">Urgente</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ticketTitle">Titulo</label>
+          <input type="text" id="ticketTitle" class="form-input" placeholder="Resumen corto del problema o solicitud" required maxlength="200">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ticketProject">Proyecto</label>
+          <select id="ticketProject" class="form-select">
+            <option value="">Sin proyecto</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ticketDescription">Descripcion</label>
+          <textarea id="ticketDescription" class="form-textarea" rows="8" placeholder="Describe detalladamente tu incidente o mejora solicitada. Incluye pasos para reproducir si aplica, comportamiento esperado vs actual, y cualquier otra información relevante." required></textarea>
+        </div>
+
+        <div id="ticketError" class="auth-error" style="display:none"></div>
+
+        <div class="form-group">
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAD-ll4MBRA3lg5Bf" data-theme="dark"></div>
+        </div>
+
+        <div class="ticket-form-actions">
+          <a href="#/tickets" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary" id="ticketSubmitBtn">
+            <span class="btn-text"><i class="ph-light ph-paper-plane-tilt"></i> Enviar Ticket</span>
+            <span class="btn-loading" style="display:none">
+              <i class="ph-light ph-spinner"></i> Enviando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var form = document.getElementById('newTicketForm');
+  var btn = document.getElementById('ticketSubmitBtn');
+  var errorEl = document.getElementById('ticketError');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var category = document.getElementById('ticketCategory').value;
+    var priority = document.getElementById('ticketPriority').value;
+    var title = document.getElementById('ticketTitle').value.trim();
+    var description = document.getElementById('ticketDescription').value.trim();
+
+    if (!category || !priority || !title || !description) {
+      showError('Por favor completa todos los campos');
+      return;
+    }
+
+    var turnstileToken = DyTTurnstile.getToken();
+    if (!turnstileToken) {
+      showError('Verificacion de seguridad requerida');
+      return;
+    }
+
+    btn.querySelector('.btn-text').style.display = 'none';
+    btn.querySelector('.btn-loading').style.display = 'inline';
+    btn.disabled = true;
+    hideError();
+
+    var projectId = document.getElementById('ticketProject').value;
+
+    createTicket({
+      Category: category,
+      Priority: priority,
+      Title: title,
+      Description: description,
+      Id_Project: projectId ? parseInt(projectId) : null,
+      TurnstileToken: turnstileToken
+    }).then(function(data) {
+      if (data && data.id) {
+        DyTTurnstile.reset();
+        navigateTo('tickets/' + data.id);
+      } else {
+        DyTTurnstile.reset();
+        showError('Error al crear el ticket');
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loading').style.display = 'none';
+        btn.disabled = false;
+      }
+    });
+  });
+
+  // Load projects for dropdown
+  getProjects().then(function(projects) {
+    var sel = document.getElementById('ticketProject');
+    (projects || []).forEach(function(p) {
+      var opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name;
+      sel.appendChild(opt);
+    });
+  });
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+  }
+
+  function hideError() {
+    errorEl.style.display = 'none';
+  }
+})();
+</script>

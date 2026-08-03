@@ -1,0 +1,206 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Ticket <span class="gold-text" id="ticketId">#0</span></h1>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;">
+        <a id="backBtn" href="#/tickets" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> <span id="backLabel">Mis Tickets</span>
+        </a>
+        <div id="ticketActions" style="display:none">
+          <select id="statusSelect" class="form-select form-select-sm">
+            <option value="open">Abierto</option>
+            <option value="in_progress">En Progreso</option>
+            <option value="resolved">Resuelto</option>
+            <option value="closed">Cerrado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticket-detail-grid reveal reveal-delay-1">
+      <div class="ticket-detail-main">
+        <div id="ticketContent" class="ticket-detail-content">
+          <div class="tickets-loading">
+            <i class="ph-light ph-spinner"></i> Cargando ticket...
+          </div>
+        </div>
+
+        <div class="ticket-detail-comments">
+          <h3 class="comments-title">Comentarios</h3>
+          <div id="commentsList" class="comments-list"></div>
+          <div class="comment-form">
+            <textarea id="commentInput" class="form-textarea" rows="3" placeholder="Escribe un comentario..."></textarea>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAD-ll4MBRA3lg5Bf" data-theme="dark"></div>
+            <button id="commentBtn" class="btn btn-primary btn-sm" style="align-self:flex-end;">
+              <i class="ph-light ph-paper-plane-tilt"></i> Enviar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-detail-sidebar">
+        <div class="sidebar-card">
+          <h4 class="sidebar-card-title">Detalles</h4>
+          <div id="ticketMeta" class="sidebar-meta"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var hash = window.location.hash;
+  var ticketId = hash.split('/').pop();
+
+  if (!ticketId || ticketId === 'new') {
+    document.getElementById('ticketContent').innerHTML = '<div class="tickets-error">Ticket no valido</div>';
+    return;
+  }
+
+  document.getElementById('ticketId').textContent = '#' + ticketId;
+
+  var currentUser = DyTAuth.getUser();
+  var isAdminView = currentUser && currentUser.role === 'admin';
+  if (isAdminView) {
+    document.getElementById('backBtn').href = '#/admin/tickets';
+    document.getElementById('backLabel').textContent = 'Admin Tickets';
+  }
+
+  function loadTicket() {
+    getTicketById(ticketId).then(function(ticket) {
+      if (!ticket) {
+        document.getElementById('ticketContent').innerHTML =
+          '<div class="tickets-error"><i class="ph-light ph-warning-circle"></i> Error al cargar ticket</div>';
+        return;
+      }
+      renderTicket(ticket);
+      loadComments();
+      setupStatusChange(ticket);
+    });
+  }
+
+  function renderTicket(t) {
+    var user = DyTAuth.getUser();
+    var isAdmin = user && user.role === 'admin';
+
+    document.getElementById('ticketContent').innerHTML =
+      '<div class="ticket-detail-head">' +
+        '<span class="badge ticket-status-' + t.status + '">' + statusLabel(t.status) + '</span>' +
+        '<span class="badge badge-secondary">' + categoryLabel(t.category) + '</span>' +
+        '<span class="badge ticket-priority-' + t.priority + '">' + priorityLabel(t.priority) + '</span>' +
+      '</div>' +
+      '<h2 class="ticket-detail-title">' + escapeHtml(t.title) + '</h2>' +
+      '<div class="ticket-detail-body">' + escapeHtml(t.description).replace(/\n/g, '<br>') + '</div>';
+
+    var projectHtml = t.projectName
+      ? '<div class="meta-item"><span class="meta-label">Proyecto</span><span class="meta-value"><a href="#/projects/' + t.idProject + '" style="color:var(--accent-primary);text-decoration:none;">' + escapeHtml(t.projectName) + '</a></span></div>'
+      : '';
+
+    document.getElementById('ticketMeta').innerHTML =
+      '<div class="meta-item"><span class="meta-label">Estado</span><span class="meta-value badge ticket-status-' + t.status + '">' + statusLabel(t.status) + '</span></div>' +
+      '<div class="meta-item"><span class="meta-label">Categoria</span><span class="meta-value">' + categoryLabel(t.category) + '</span></div>' +
+      '<div class="meta-item"><span class="meta-label">Prioridad</span><span class="meta-value badge ticket-priority-' + t.priority + '">' + priorityLabel(t.priority) + '</span></div>' +
+      projectHtml +
+      '<div class="meta-item"><span class="meta-label">Creado</span><span class="meta-value">' + formatDate(t.createdAt) + '</span></div>' +
+      (t.updatedAt ? '<div class="meta-item"><span class="meta-label">Actualizado</span><span class="meta-value">' + formatDate(t.updatedAt) + '</span></div>' : '');
+
+    if (isAdmin) {
+      document.getElementById('ticketActions').style.display = 'block';
+      document.getElementById('statusSelect').value = t.status;
+    }
+
+    var commentForm = document.querySelector('.comment-form');
+    if (commentForm) {
+      commentForm.style.display = (t.idProject && !isAdmin) ? 'none' : '';
+    }
+  }
+
+  function loadComments() {
+    getTicketComments(ticketId).then(function(data) {
+      var comments = data || [];
+      var container = document.getElementById('commentsList');
+      if (!comments.length) {
+        container.innerHTML = '<div class="comments-empty">No hay comentarios aún</div>';
+        return;
+      }
+      container.innerHTML = comments.map(function(c) {
+        return '<div class="comment-card">' +
+          '<div class="comment-header">' +
+            '<span class="comment-author">' + escapeHtml(c.userName || 'Usuario') + '</span>' +
+            '<span class="comment-date">' + formatDate(c.createdAt) + '</span>' +
+          '</div>' +
+          '<div class="comment-body">' + escapeHtml(c.content).replace(/\n/g, '<br>') + '</div>' +
+        '</div>';
+      }).join('');
+    });
+  }
+
+  function setupStatusChange(ticket) {
+    var select = document.getElementById('statusSelect');
+    select.addEventListener('change', function() {
+      updateTicketStatus(ticketId, select.value).then(function() {
+        loadTicket();
+      });
+    });
+  }
+
+  document.getElementById('commentBtn').addEventListener('click', function() {
+    var input = document.getElementById('commentInput');
+    var content = input.value.trim();
+    if (!content) return;
+
+    var turnstileToken = DyTTurnstile.getToken();
+    if (!turnstileToken) {
+      showError('Verificacion de seguridad requerida');
+      return;
+    }
+
+    var btn = this;
+    btn.disabled = true;
+
+    addTicketComment(ticketId, {
+      Content: content,
+      TurnstileToken: turnstileToken
+    }).then(function() {
+      input.value = '';
+      DyTTurnstile.reset();
+      loadComments();
+      btn.disabled = false;
+    });
+  });
+
+  function statusLabel(s) {
+    var map = { open: 'Abierto', in_progress: 'En Progreso', resolved: 'Resuelto', closed: 'Cerrado' };
+    return map[s] || s;
+  }
+
+  function priorityLabel(p) {
+    var map = { low: 'Baja', medium: 'Media', high: 'Alta', urgent: 'Urgente' };
+    return map[p] || p;
+  }
+
+  function categoryLabel(c) {
+    var map = { incident: 'Incidente', improvement: 'Mejora', support: 'Soporte', other: 'Otro' };
+    return map[c] || c;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ', ' +
+      String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  loadTicket();
+})();
+</script>

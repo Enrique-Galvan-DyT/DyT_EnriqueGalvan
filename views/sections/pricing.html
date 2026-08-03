@@ -1,0 +1,688 @@
+<!-- Pricing Section - Dark Luxury -->
+<section id="precios" style="padding: var(--section-padding) 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <span class="eyebrow reveal">
+        <i class="ph-light ph-currency-dollar"></i>
+        Precios
+      </span>
+      <h2 class="reveal reveal-delay-1" style="margin-bottom: 1rem;">Planes transparentes</h2>
+      <p class="reveal reveal-delay-2" style="margin: 0 auto; max-width: 520px;">
+        Sin costos ocultos, sin sorpresas. Elige el plan que mejor se adapte a tu proyecto.
+      </p>
+    </div>
+
+    <div class="pricing-carousel">
+      <button class="pricing-scroll-btn pricing-scroll-prev" id="pricingPrev" aria-label="Planes anteriores">
+        <i class="ph-light ph-caret-left"></i>
+      </button>
+      <div class="pricing-grid" id="pricingPlans">
+        <div class="pricing-loading">Cargando planes...</div>
+      </div>
+      <button class="pricing-scroll-btn pricing-scroll-next" id="pricingNext" aria-label="Siguientes planes">
+        <i class="ph-light ph-caret-right"></i>
+      </button>
+    </div>
+
+    <p class="pricing-domain-note">
+      <i class="ph-light ph-globe-hemisphere-west"></i>
+      Los planes incluyen 1 dominio con terminación .com, .com.mx, .net u .org (costo anual hasta $600 MXN).
+      Otras terminaciones se cotizan por separado.
+    </p>
+
+    <div class="reveal" style="text-align: center; margin-top: 3rem;">
+      <p style="color: var(--text-muted); font-size: 0.9375rem;">
+        ¿Necesitas algo a medida?
+        <button class="pricing-builder-btn" id="openBuilderBtn">
+          <i class="ph-light ph-sliders-horizontal"></i> Arma tu paquete
+        </button>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Builder Modal -->
+<div class="pricing-modal-overlay" id="pricingModal">
+  <div class="pricing-modal">
+    <div class="pricing-modal-header">
+      <div>
+        <h2 class="pricing-modal-title">Arma tu paquete</h2>
+        <p class="pricing-modal-subtitle">Selecciona los elementos que necesitas y cotiza en tiempo real</p>
+      </div>
+      <button class="pricing-modal-close" id="closeBuilderBtn">
+        <i class="ph-light ph-x"></i>
+      </button>
+    </div>
+
+    <div class="pricing-modal-body">
+      <div class="pricing-builder" id="pricingBuilder"></div>
+
+      <div class="pricing-summary" id="pricingSummary">
+        <h3 class="pricing-summary-title">Resumen</h3>
+        <div class="pricing-summary-items">
+          <div class="pricing-summary-row">
+            <span>Desarrollo</span>
+            <span class="pricing-summary-dev" id="summaryDev">$0</span>
+          </div>
+          <div class="pricing-summary-row pricing-summary-row--monthly">
+            <span>Renta mensual</span>
+            <span class="pricing-summary-monthly" id="summaryMonthly">$0 MXN/mes</span>
+          </div>
+        </div>
+        <div class="pricing-summary-total">
+          <div class="pricing-summary-total-row">
+            <span>Total desarrollo</span>
+            <span class="pricing-total-dev gold-text" id="totalDev">$0 MXN</span>
+          </div>
+          <div class="pricing-summary-total-row">
+            <span>Renta mensual</span>
+            <span class="pricing-total-monthly" id="totalMonthly">$0 MXN/mes</span>
+          </div>
+        </div>
+        <a href="#contacto" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;" id="contactFromBuilder">
+          <i class="ph-light ph-paper-plane-tilt"></i> Solicitar cotización
+        </a>
+        <p class="pricing-summary-note">Los precios son en pesos mexicanos (MXN)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="pricing-modal-overlay checkout-modal" id="checkoutModal">
+  <div class="pricing-modal">
+    <div class="pricing-modal-header">
+      <div>
+        <h2 class="pricing-modal-title" id="checkoutTier">Plan</h2>
+        <p class="pricing-modal-subtitle" id="checkoutTitle"></p>
+      </div>
+      <button class="pricing-modal-close" id="closeCheckoutBtn">
+        <i class="ph-light ph-x"></i>
+      </button>
+    </div>
+
+    <div class="pricing-modal-body">
+      <div class="checkout-summary">
+        <div class="checkout-row">
+          <span>Desarrollo</span>
+          <span class="checkout-price" id="checkoutPrice">$0</span>
+        </div>
+        <div class="checkout-row">
+          <span>Renta mensual</span>
+          <span class="checkout-monthly" id="checkoutMonthly">$0 MXN/mes</span>
+        </div>
+        <p class="checkout-description" id="checkoutDescription"></p>
+      </div>
+
+      <form id="cardForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="checkoutName">Nombre en la tarjeta</label>
+          <input class="form-input" id="checkoutName" type="text" data-conekta="card[name]" autocomplete="cc-name" placeholder="Nombre y apellidos" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="checkoutEmail">Email de contacto</label>
+          <input class="form-input" id="checkoutEmail" type="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="checkoutCardNumber">Número de tarjeta</label>
+          <input class="form-input" id="checkoutCardNumber" type="text" inputmode="numeric" data-conekta="card[number]" autocomplete="cc-number" placeholder="4242 4242 4242 4242" required>
+        </div>
+        <div class="form-row" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="form-group">
+            <label class="form-label" for="checkoutCardCvc">CVC</label>
+            <input class="form-input" id="checkoutCardCvc" type="text" inputmode="numeric" data-conekta="card[cvc]" autocomplete="cc-csc" placeholder="123" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="checkoutCardMonth">Mes</label>
+            <input class="form-input" id="checkoutCardMonth" type="text" inputmode="numeric" data-conekta="card[exp_month]" autocomplete="cc-exp-month" placeholder="MM" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="checkoutCardYear">Año</label>
+            <input class="form-input" id="checkoutCardYear" type="text" inputmode="numeric" data-conekta="card[exp_year]" autocomplete="cc-exp-year" placeholder="AA" required>
+          </div>
+        </div>
+        <div class="checkout-error" id="checkoutError" style="display:none;"></div>
+        <button type="submit" class="btn btn-primary checkout-pay-btn" id="payButton">
+          <i class="ph-light ph-lock"></i> <span id="payButtonLabel">Pagar</span>
+        </button>
+        <p class="checkout-secure-note">
+          <i class="ph-light ph-shield-check"></i> Pago seguro procesado por Conekta. Tus datos de tarjeta nunca se almacenan.
+        </p>
+      </form>
+
+      <div class="checkout-success" id="checkoutSuccess" style="display:none;">
+        <i class="ph-light ph-check-circle"></i>
+        <h3>Pago exitoso</h3>
+        <p id="checkoutSuccessMsg">Tu pago fue procesado y el plan quedó activado en tu cuenta.</p>
+        <button class="btn btn-primary checkout-pay-btn" id="checkoutDoneBtn">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+(function() {
+  var pricingItems = [
+    { id: 1, tag: 'landing', name: 'Landing Page', description: 'Página de aterrizaje responsiva con diseño personalizado', devPrice: 4500, monthlyPrice: 1575, category: 'pages', included: 'basic', qty: false },
+    { id: 2, tag: 'page', name: 'Página adicional', description: 'Página extra con diseño personalizado', devPrice: 1200, monthlyPrice: 420, category: 'pages', included: null, qty: true, minQty: 1, maxQty: 20 },
+    { id: 3, tag: 'form-basic', name: 'Formulario de contacto', description: 'Campos: nombre, email, teléfono, mensaje. Validación básica', devPrice: 800, monthlyPrice: 280, category: 'forms', included: 'basic', qty: false },
+    { id: 4, tag: 'form-advanced', name: 'Formulario avanzado', description: 'Campos dinámicos, subida de archivos, validación, email de confirmación al admin', devPrice: 1500, monthlyPrice: 525, category: 'forms', included: 'standard', qty: false },
+    { id: 5, tag: 'gallery', name: 'Galería de imágenes', description: 'Hasta 20 imágenes con lightbox, diseño responsivo', devPrice: 1200, monthlyPrice: 420, category: 'media', included: 'standard', qty: false },
+    { id: 6, tag: 'testimonials', name: 'Testimonios', description: 'Sección de reseñas de clientes', devPrice: 800, monthlyPrice: 280, category: 'content', included: 'standard', qty: false },
+    { id: 7, tag: 'blog', name: 'Blog integrado', description: 'Posts, categorías y tags. Gestión desde admin', devPrice: 3500, monthlyPrice: 1225, category: 'content', included: 'premium', qty: false },
+    { id: 8, tag: 'admin-panel', name: 'Panel de administración', description: 'Dashboard con estadísticas + 1 CRUD (productos, servicios o posts)', devPrice: 5000, monthlyPrice: 1750, category: 'functionality', included: 'premium', qty: false },
+    { id: 9, tag: 'seo-advanced', name: 'SEO avanzado', description: 'Meta tags, sitemap XML, schema markup, optimización on-page', devPrice: 2000, monthlyPrice: 700, category: 'marketing', included: 'standard', qty: false },
+    { id: 10, tag: 'analytics', name: 'Google Analytics', description: 'Integración completa con tracking de eventos', devPrice: 800, monthlyPrice: 280, category: 'marketing', included: 'standard', qty: false },
+    { id: 11, tag: 'whatsapp', name: 'Integración WhatsApp', description: 'Botón flotante y enlace directo', devPrice: 500, monthlyPrice: 175, category: 'integrations', included: 'basic', qty: false },
+    { id: 12, tag: 'social-full', name: 'Redes sociales completa', description: 'Feeds, share buttons, meta tags Open Graph para RRSS', devPrice: 1500, monthlyPrice: 525, category: 'integrations', included: 'standard', qty: false },
+    { id: 13, tag: 'email', name: 'Correo corporativo', description: 'Cuenta de correo con tu dominio', devPrice: 0, monthlyPrice: 150, category: 'services', included: null, qty: true, minQty: 1, maxQty: 10 },
+    { id: 14, tag: 'storage', name: 'Almacenamiento adicional', description: 'Espacio extra en el servidor (por GB)', devPrice: 0, monthlyPrice: 100, category: 'services', included: null, qty: true, minQty: 1, maxQty: 50 },
+    { id: 15, tag: 'support', name: 'Soporte prioritario', description: 'Atención preferente y respuesta garantizada', devPrice: 0, monthlyPrice: 500, category: 'services', included: null, qty: false },
+    { id: 16, tag: 'backup-monthly', name: 'Respaldo mensual de BD', description: 'Respaldo automático mensual de base de datos, almacenado 30 días', devPrice: 0, monthlyPrice: 200, category: 'services', included: 'standard', qty: false },
+    { id: 17, tag: 'backup-weekly', name: 'Respaldo semanal de BD', description: 'Respaldo automático semanal de base de datos, almacenado 30 días', devPrice: 0, monthlyPrice: 400, category: 'services', included: 'premium', qty: false },
+    { id: 18, tag: 'ssl', name: 'Certificado SSL', description: 'HTTPS seguro para todo el dominio', devPrice: 0, monthlyPrice: 100, category: 'services', included: null, qty: false },
+    { id: 19, tag: 'hosting', name: 'Hosting profesional', description: 'Hosting en servidor dedicado con 99.9% uptime', devPrice: 0, monthlyPrice: 500, category: 'services', included: null, qty: false },
+    { id: 20, tag: 'domain', name: 'Dominio .com', description: 'Registro de dominio .com (1 año)', devPrice: 0, monthlyPrice: 200, category: 'services', included: null, qty: false },
+    { id: 21, tag: 'anti-spam', name: 'Anti-spam formularios', description: 'CAPTCHA, rate limiting, filtrado de spam', devPrice: 500, monthlyPrice: 100, category: 'forms', included: 'standard', qty: false },
+    { id: 22, tag: 'payment', name: 'Pasarela de pagos', description: 'Integración con Stripe, PayPal o MercadoPago', devPrice: 3000, monthlyPrice: 500, category: 'functionality', included: null, qty: false },
+    { id: 23, tag: 'legal', name: 'Aviso de privacidad y Términos', description: 'Páginas legales personalizadas conforme a la LFPDPPP', devPrice: 1500, monthlyPrice: 0, category: 'content', included: null, qty: false }
+  ];
+
+  var categories = {
+    pages: 'Páginas',
+    forms: 'Formularios',
+    media: 'Medios',
+    content: 'Contenido',
+    functionality: 'Funcionalidad',
+    marketing: 'Marketing',
+    integrations: 'Integraciones',
+    services: 'Servicios'
+  };
+
+  var selected = {};
+  var quantities = {};
+
+  var builder = document.getElementById('pricingBuilder');
+  var modal = document.getElementById('pricingModal');
+  var openBtn = document.getElementById('openBuilderBtn');
+  var closeBtn = document.getElementById('closeBuilderBtn');
+
+  function render() {
+    var html = '';
+    Object.keys(categories).forEach(function(catKey) {
+      var items = pricingItems.filter(function(i) { return i.category === catKey; });
+      if (!items.length) return;
+      html += '<div class="pricing-category">';
+      html += '<div class="pricing-category-title">' + categories[catKey] + '</div>';
+      items.forEach(function(item) {
+        var isSelected = selected[item.id];
+        var qty = quantities[item.id] || 1;
+        var devTotal = item.devPrice * qty;
+        var monthTotal = item.monthlyPrice * qty;
+        var selectedClass = isSelected ? ' selected' : '';
+
+        html += '<div class="pricing-item' + selectedClass + '" data-id="' + item.id + '">';
+        html += '<div class="pricing-item-left">';
+        html += '<div class="pricing-item-check"><i class="ph-bold ph-check"></i></div>';
+        html += '<div class="pricing-item-info">';
+        html += '<div class="pricing-item-name">' + item.name + '</div>';
+        html += '<div class="pricing-item-desc">' + item.description + '</div>';
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="pricing-item-right">';
+
+        if (item.qty) {
+          html += '<div class="pricing-item-qty">';
+          html += '<button class="pricing-qty-btn" data-action="dec" data-id="' + item.id + '"><i class="ph-bold ph-minus"></i></button>';
+          html += '<span class="pricing-qty-value">' + qty + '</span>';
+          html += '<button class="pricing-qty-btn" data-action="inc" data-id="' + item.id + '"><i class="ph-bold ph-plus"></i></button>';
+          html += '</div>';
+        }
+
+        if (item.devPrice > 0) {
+          html += '<div class="pricing-item-price">$' + formatNum(devTotal) + '</div>';
+        }
+        if (item.monthlyPrice > 0) {
+          html += '<div class="pricing-item-monthly">$' + formatNum(monthTotal) + '/mes</div>';
+        }
+        html += '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    builder.innerHTML = html;
+    updateSummary();
+    bindEvents();
+  }
+
+  function updateSummary() {
+    var totalDev = 0;
+    var totalMonthly = 0;
+
+    pricingItems.forEach(function(item) {
+      if (selected[item.id]) {
+        var qty = quantities[item.id] || 1;
+        totalDev += item.devPrice * qty;
+        totalMonthly += item.monthlyPrice * qty;
+      }
+    });
+
+    document.getElementById('summaryDev').textContent = '$' + formatNum(totalDev);
+    document.getElementById('summaryMonthly').textContent = '$' + formatNum(totalMonthly) + ' MXN/mes';
+    document.getElementById('totalDev').textContent = '$' + formatNum(totalDev) + ' MXN';
+    document.getElementById('totalMonthly').textContent = '$' + formatNum(totalMonthly) + ' MXN/mes';
+  }
+
+  function formatNum(n) {
+    return n.toLocaleString('es-MX');
+  }
+
+  function bindEvents() {
+    builder.querySelectorAll('.pricing-item').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        if (e.target.closest('.pricing-qty-btn')) return;
+        var id = parseInt(el.getAttribute('data-id'));
+        if (selected[id]) {
+          delete selected[id];
+          el.classList.remove('selected');
+        } else {
+          selected[id] = true;
+          el.classList.add('selected');
+        }
+        updateSummary();
+      });
+    });
+
+    builder.querySelectorAll('.pricing-qty-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = parseInt(btn.getAttribute('data-id'));
+        var action = btn.getAttribute('data-action');
+        var item = pricingItems.find(function(i) { return i.id === id; });
+        if (!item) return;
+
+        if (!quantities[id]) quantities[id] = 1;
+
+        if (action === 'inc' && quantities[id] < (item.maxQty || 99)) {
+          quantities[id]++;
+        } else if (action === 'dec' && quantities[id] > (item.minQty || 1)) {
+          quantities[id]--;
+        }
+
+        var qtyEl = btn.parentElement.querySelector('.pricing-qty-value');
+        if (qtyEl) qtyEl.textContent = quantities[id];
+
+        var priceEl = btn.closest('.pricing-item').querySelector('.pricing-item-price');
+        if (priceEl && item.devPrice > 0) {
+          priceEl.textContent = '$' + formatNum(item.devPrice * quantities[id]);
+        }
+        var monthlyEl = btn.closest('.pricing-item').querySelector('.pricing-item-monthly');
+        if (monthlyEl && item.monthlyPrice > 0) {
+          monthlyEl.textContent = '$' + formatNum(item.monthlyPrice * quantities[id]) + '/mes';
+        }
+
+        updateSummary();
+      });
+    });
+  }
+
+  if (openBtn) {
+    openBtn.addEventListener('click', function() {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      render();
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+})();
+</script>
+
+<script>
+(function() {
+  var grid = document.getElementById('pricingPlans');
+  if (!grid) return;
+
+  var prevBtn = document.getElementById('pricingPrev');
+  var nextBtn = document.getElementById('pricingNext');
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function normalizeLevel(str) {
+    var t = (str || '').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (t === 'basico') return 'basico';
+    if (t === 'estandar') return 'estandar';
+    if (t === 'intermedio') return 'intermedio';
+    if (t === 'avanzado') return 'avanzado';
+    if (t === 'premium') return 'premium';
+    if (t === 'todos' || t === 'todos los niveles') return 'todos';
+    return t;
+  }
+
+  function formatMoney(n) {
+    return Number(n || 0).toLocaleString('es-MX', { maximumFractionDigits: 2 });
+  }
+
+  function monthlyAmount(price) {
+    return price * 0.65;
+  }
+
+  var currentCheckout = null;
+  var conektaPublicKey = null;
+
+  function openCheckout(plan) {
+    var modal = document.getElementById('checkoutModal');
+    if (!modal) return;
+    currentCheckout = { plan: plan };
+    document.getElementById('checkoutTier').textContent = plan.level;
+    document.getElementById('checkoutTitle').textContent = plan.title;
+    document.getElementById('checkoutPrice').textContent = '$' + formatMoney(plan.price);
+    document.getElementById('checkoutMonthly').textContent = '$' + formatMoney(monthlyAmount(plan.price)) + ' MXN/mes';
+    var desc = document.getElementById('checkoutDescription');
+    if (desc) desc.textContent = plan.description;
+
+    var summary = document.querySelector('#checkoutModal .checkout-summary');
+    var form = document.getElementById('cardForm');
+    var success = document.getElementById('checkoutSuccess');
+    if (summary) summary.style.display = '';
+    if (form) form.style.display = '';
+    if (success) success.style.display = 'none';
+    hideCheckoutError();
+
+    var user = (window.DyTAuth && DyTAuth.getUser) ? DyTAuth.getUser() : null;
+    if (user) {
+      var nameEl = document.getElementById('checkoutName');
+      var emailEl = document.getElementById('checkoutEmail');
+      if (nameEl) nameEl.value = user.name || '';
+      if (emailEl) emailEl.value = user.email || '';
+    }
+
+    var payBtn = document.getElementById('payButton');
+    if (payBtn) {
+      payBtn.disabled = false;
+      document.getElementById('payButtonLabel').textContent = 'Pagar $' + formatMoney(plan.price) + ' MXN';
+    }
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function() {
+      var nameField = document.getElementById('checkoutName');
+      if (nameField) nameField.focus();
+    }, 250);
+
+    loadPaymentConfig();
+  }
+
+  function loadPaymentConfig() {
+    if (conektaPublicKey || typeof getPaymentConfig !== 'function') return;
+    getPaymentConfig().then(function(data) {
+      if (data && data.publicKey && typeof Conekta !== 'undefined') {
+        conektaPublicKey = data.publicKey;
+        Conekta.setPublicKey(conektaPublicKey);
+        Conekta.setLanguage('es');
+      }
+    });
+  }
+
+  function showCheckoutError(msg) {
+    var el = document.getElementById('checkoutError');
+    if (el) {
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+  }
+
+  function hideCheckoutError() {
+    var el = document.getElementById('checkoutError');
+    if (el) el.style.display = 'none';
+  }
+
+  function submitCard(e) {
+    e.preventDefault();
+    if (!conektaPublicKey || typeof Conekta === 'undefined') {
+      showCheckoutError('No se pudo cargar la pasarela de pago. Intenta de nuevo.');
+      return;
+    }
+    var payBtn = document.getElementById('payButton');
+    var label = document.getElementById('payButtonLabel');
+    payBtn.disabled = true;
+    label.textContent = 'Procesando...';
+    hideCheckoutError();
+
+    function restoreLabel() {
+      payBtn.disabled = false;
+      if (currentCheckout) {
+        label.textContent = 'Pagar $' + formatMoney(currentCheckout.plan.price) + ' MXN';
+      } else {
+        label.textContent = 'Pagar';
+      }
+    }
+
+    try {
+      Conekta.Token.create(document.getElementById('cardForm'), function(token) {
+        if (token && token.id) {
+          processCheckoutToken(token.id);
+        } else {
+          restoreLabel();
+          showCheckoutError('No se pudo procesar la tarjeta.');
+        }
+      }, function(error) {
+        restoreLabel();
+        var msg = (error && (error.message_to_purchaser || error.message)) || 'Datos de tarjeta inválidos.';
+        showCheckoutError(msg);
+      });
+    } catch (err) {
+      restoreLabel();
+      showCheckoutError('Error inesperado al procesar la tarjeta.');
+    }
+  }
+
+  function processCheckoutToken(tokenId) {
+    if (!currentCheckout || !currentCheckout.plan) return;
+    if (typeof createPaymentCheckout !== 'function') return;
+    createPaymentCheckout(
+      currentCheckout.plan.id,
+      tokenId,
+      document.getElementById('checkoutName').value,
+      document.getElementById('checkoutEmail').value
+    ).then(function(json) {
+      var payBtn = document.getElementById('payButton');
+      var label = document.getElementById('payButtonLabel');
+      if (json && json.success === true) {
+        if (json.data && json.data.paid) {
+          showCheckoutSuccess();
+        } else {
+          payBtn.disabled = false;
+          label.textContent = 'Pagar $' + formatMoney(currentCheckout.plan.price) + ' MXN';
+          showCheckoutError((json.data && json.data.status) ? 'Pago ' + json.data.status + '. Intenta de nuevo o usa otra tarjeta.' : 'Pago pendiente.');
+        }
+      } else if (json && json.alreadyPurchased) {
+        showCheckoutSuccess('Ya habías adquirido este plan.');
+      } else if (json && json.paymentError) {
+        payBtn.disabled = false;
+        label.textContent = 'Pagar $' + formatMoney(currentCheckout.plan.price) + ' MXN';
+        showCheckoutError(json.message || 'La tarjeta fue rechazada.');
+      } else {
+        payBtn.disabled = false;
+        label.textContent = 'Pagar $' + formatMoney(currentCheckout.plan.price) + ' MXN';
+        showCheckoutError((json && json.message) || 'No se pudo completar el pago.');
+      }
+    });
+  }
+
+  function showCheckoutSuccess(customMsg) {
+    var summary = document.querySelector('#checkoutModal .checkout-summary');
+    var form = document.getElementById('cardForm');
+    if (summary) summary.style.display = 'none';
+    if (form) form.style.display = 'none';
+    var msgEl = document.getElementById('checkoutSuccessMsg');
+    if (msgEl) msgEl.textContent = customMsg || 'Tu pago fue procesado y el plan quedó activado en tu cuenta.';
+    var success = document.getElementById('checkoutSuccess');
+    if (success) success.style.display = '';
+  }
+
+  function closeCheckout() {
+    var modal = document.getElementById('checkoutModal');
+    if (modal) modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function handleBuy(plan) {
+    if (window.DyTAuth && DyTAuth.isLoggedIn()) {
+      openCheckout(plan);
+    } else {
+      window.location.hash = '#/login';
+    }
+  }
+
+  function renderPlans(plans) {
+    if (!plans || !plans.length) {
+      grid.innerHTML = '<div class="pricing-empty">No hay planes disponibles por el momento.</div>';
+      return;
+    }
+
+    grid.innerHTML = plans.map(function(plan, idx) {
+      var level = normalizeLevel(plan.level);
+      var isPopular = level === 'estandar';
+      var isBuy = level !== 'premium';
+
+      var tierColor = isPopular ? ' style="color: var(--accent-primary);"' : '';
+      var amountClass = isPopular ? ' gold-text' : '';
+      var popularBadge = isPopular ? '<div class="pricing-popular">Popular</div>' : '';
+      var bodyHtml = plan.bodyHtml ? DOMPurify.sanitize(plan.bodyHtml) : '';
+      var descHtml = plan.description ? '<div class="pricing-description">' + escapeHtml(plan.description) + '</div>' : '';
+
+      var cta;
+      if (isBuy) {
+        cta = '<button class="btn btn-primary" style="width:100%;justify-content:center;" data-buy="' + idx + '">Elegir Plan</button>';
+      } else {
+        cta = '<a href="#contacto" class="btn btn-secondary" style="width:100%;justify-content:center;">Contactar</a>';
+      }
+
+      return '<div class="card-bezel" style="position:relative;">' +
+        popularBadge +
+        '<div class="card-bezel-inner pricing-card">' +
+          '<div class="pricing-header">' +
+            '<span class="pricing-tier"' + tierColor + '>' + escapeHtml(plan.level) + '</span>' +
+            '<div class="pricing-price">' +
+              '<span class="pricing-currency">$</span>' +
+              '<span class="pricing-amount' + amountClass + '">' + formatMoney(plan.price) + '</span>' +
+              '<span class="pricing-period">MXN</span>' +
+            '</div>' +
+            '<div class="pricing-monthly">' +
+              '<span class="pricing-monthly-amount">$' + formatMoney(monthlyAmount(plan.price)) + '</span> MXN/mes' +
+            '</div>' +
+            '<p style="font-size:0.8125rem;color:var(--text-muted);margin:0;">' + escapeHtml(plan.title) + '</p>' +
+          '</div>' +
+          (bodyHtml ? '<div class="pricing-body">' + bodyHtml + '</div>' : '') +
+          descHtml +
+          cta +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    grid.querySelectorAll('[data-buy]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-buy'));
+        if (plans[idx]) handleBuy(plans[idx]);
+      });
+    });
+
+    var hideArrows = plans.length <= 3;
+    if (prevBtn) prevBtn.style.display = hideArrows ? 'none' : '';
+    if (nextBtn) nextBtn.style.display = hideArrows ? 'none' : '';
+  }
+
+  function fetchPlans() {
+    if (typeof getAcademyResources !== 'function') {
+      grid.innerHTML = '<div class="pricing-empty">No hay planes disponibles por el momento.</div>';
+      return;
+    }
+    getAcademyResources().then(function(data) {
+      var items = (data || []).filter(function(r) {
+        return (r.category || r.Category) === 'plan';
+      }).filter(function(r) {
+        var available = r.isAvailable !== undefined ? r.isAvailable : (r.IsAvailable !== undefined ? r.IsAvailable : true);
+        return !!available;
+      }).sort(function(a, b) {
+        return Number(a.price || a.Price || 0) - Number(b.price || b.Price || 0);
+      });
+
+      renderPlans(items.map(function(r) {
+        return {
+          id: r.id || r.Id_AcademyResource,
+          level: r.level || r.Resource_Level || '',
+          price: Number(r.price || r.Price || 0),
+          title: r.title || r.Title || '',
+          description: r.description || r.Resource_Description || '',
+          bodyHtml: r.bodyHtml || r.BodyHtml || ''
+        };
+      }));
+    }).catch(function() {
+      grid.innerHTML = '<div class="pricing-empty">No se pudieron cargar los planes.</div>';
+    });
+  }
+
+  fetchPlans();
+  loadPaymentConfig();
+
+  function scrollByCard(dir) {
+    var card = grid.querySelector('.card-bezel');
+    var width = card ? card.offsetWidth + 20 : 360;
+    grid.scrollBy({ left: dir * width, behavior: 'smooth' });
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function() { scrollByCard(-1); });
+  if (nextBtn) nextBtn.addEventListener('click', function() { scrollByCard(1); });
+
+  // Checkout modal close
+  var checkoutModal = document.getElementById('checkoutModal');
+  if (checkoutModal) {
+    var checkoutClose = document.getElementById('closeCheckoutBtn');
+    if (checkoutClose) {
+      checkoutClose.addEventListener('click', function() {
+        checkoutModal.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    }
+    checkoutModal.addEventListener('click', function(e) {
+      if (e.target === checkoutModal) {
+        checkoutModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  var cardForm = document.getElementById('cardForm');
+  if (cardForm) cardForm.addEventListener('submit', submitCard);
+
+  var doneBtn = document.getElementById('checkoutDoneBtn');
+  if (doneBtn) doneBtn.addEventListener('click', closeCheckout);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && checkoutModal && checkoutModal.classList.contains('active')) {
+      checkoutModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+})();
+</script>

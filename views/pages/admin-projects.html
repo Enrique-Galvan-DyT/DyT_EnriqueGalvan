@@ -1,0 +1,713 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Administrar <span class="gold-text">Proyectos</span></h1>
+        <p class="dashboard-subtitle">Gestiona los proyectos del portafolio</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <a href="#/admin" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> Volver
+        </a>
+        <button class="btn btn-primary" id="btnCreateProject">
+          <i class="ph-light ph-plus"></i> Nuevo Proyecto
+        </button>
+      </div>
+    </div>
+
+    <div class="dashboard-stats reveal reveal-delay-1">
+      <div class="stat-card">
+        <div class="stat-card-icon"><i class="ph-light ph-briefcase"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statTotal">0</span>
+          <span class="stat-card-label">Total</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--open"><i class="ph-light ph-globe"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statPublic">0</span>
+          <span class="stat-card-label">Publicos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--progress"><i class="ph-light ph-lock"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statPrivate">0</span>
+          <span class="stat-card-label">Privados</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--resolved"><i class="ph-light ph-check-circle"></i></div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statApproved">0</span>
+          <span class="stat-card-label">Aprobados</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-section reveal reveal-delay-2" style="margin-top:1.5rem;">
+      <div id="projectsList" class="academy-resources-list">
+        <div class="academy-list-empty">
+          <i class="ph-light ph-briefcase"></i>
+          <p>Cargando proyectos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Modal -->
+  <div id="projectModal" class="academy-modal-overlay" style="display:none;">
+    <div class="academy-modal-card" style="max-width:800px;">
+      <div class="academy-modal-header">
+        <h3 id="modalTitle">Nuevo Proyecto</h3>
+        <button class="academy-modal-close" id="btnCloseModal"><i class="ph-light ph-x"></i></button>
+      </div>
+      <form id="projectForm" class="academy-modal-body">
+        <input type="hidden" id="formId">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" for="formName">Nombre</label>
+            <input type="text" id="formName" class="form-input" placeholder="Nombre del proyecto" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formStatus">Estado</label>
+            <select id="formStatus" class="form-input" required>
+              <option value="planning">Planeacion</option>
+              <option value="in_progress">En Progreso</option>
+              <option value="completed">Completado</option>
+              <option value="maintenance">Mantenimiento</option>
+              <option value="archived">Archivado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="formDescription">Descripcion</label>
+          <textarea id="formDescription" class="form-input" rows="3" placeholder="Descripcion del proyecto"></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" for="formIsPublic">Publico</label>
+            <select id="formIsPublic" class="form-input">
+              <option value="true">Si</option>
+              <option value="false" selected>No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formIdUser">Cliente</label>
+            <select id="formIdUser" class="form-input">
+              <option value="">Ninguno</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" for="formStartDate">Fecha inicio</label>
+            <input type="date" id="formStartDate" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formEndDate">Fecha fin</label>
+            <input type="date" id="formEndDate" class="form-input">
+          </div>
+        </div>
+
+        <!-- Content Files -->
+        <div class="form-group">
+          <label class="form-label">Archivos e imagenes</label>
+          <div class="content-files-list" id="contentFilesList"></div>
+          <label class="media-upload-label media-upload-label--small">
+            <i class="ph-light ph-paperclip"></i>
+            <span>Agregar archivo</span>
+            <input type="file" id="formFileUpload" accept="image/jpeg,image/png,image/webp,image/gif,.pdf,.doc,.docx,.xls,.xlsx,.zip,.txt" style="display:none;">
+          </label>
+          <div id="fileUploadProgress" class="media-progress" style="display:none;">
+            <div class="media-progress-bar"><div class="media-progress-fill"></div></div>
+            <span class="media-progress-text">Subiendo...</span>
+          </div>
+        </div>
+
+        <!-- Body Content (CKEditor) -->
+        <div class="form-group">
+          <label class="form-label">Contenido principal</label>
+          <span class="form-hint" style="display:block;margin-bottom:0.5rem;">Usa <code>{{file:N}}</code> para insertar un archivo donde N es su posicion (0, 1, 2...)</span>
+          <textarea id="formBodyHtml" rows="12"></textarea>
+        </div>
+
+        <div id="formError" class="auth-error" style="display:none"></div>
+
+        <div class="academy-modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveProject">
+            <span class="btn-text">Guardar</span>
+            <span class="btn-loading" style="display:none"><i class="ph-light ph-spinner"></i> Guardando...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="academy-modal-overlay" style="display:none;">
+    <div class="academy-modal-card">
+      <div class="academy-modal-header">
+        <h3 id="confirmTitle">Confirmar</h3>
+        <button class="academy-modal-close" id="btnConfirmClose"><i class="ph-light ph-x"></i></button>
+      </div>
+      <div class="academy-modal-body">
+        <p id="confirmMessage" style="margin:0;color:var(--text-secondary);">¿Estas seguro?</p>
+      </div>
+      <div class="academy-modal-footer">
+        <button class="btn btn-secondary" id="btnConfirmCancel">Cancelar</button>
+        <button class="btn btn-primary" id="btnConfirmAccept">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var allProjects = [];
+  var modal = document.getElementById('projectModal');
+  var form = document.getElementById('projectForm');
+  var formError = document.getElementById('formError');
+  var editingProjectId = null;
+
+  // --- Media state ---
+  var currentFiles = [];
+  var thumbnailIndex = -1;
+  var originalContentIds = [];
+
+  function loadProjects() {
+    getProjects().then(function(data) {
+      allProjects = data || [];
+      updateStats();
+      renderList();
+    });
+  }
+
+  function updateStats() {
+    var total = allProjects.length;
+    var pub = allProjects.filter(function(p) { return p.isPublic; }).length;
+    var priv = allProjects.filter(function(p) { return !p.isPublic; }).length;
+    var approved = allProjects.filter(function(p) { return p.clientApproved; }).length;
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statPublic').textContent = pub;
+    document.getElementById('statPrivate').textContent = priv;
+    document.getElementById('statApproved').textContent = approved;
+  }
+
+  function renderList() {
+    var container = document.getElementById('projectsList');
+    if (!allProjects.length) {
+      container.innerHTML = '<div class="academy-list-empty"><i class="ph-light ph-briefcase"></i><p>No hay proyectos</p></div>';
+      return;
+    }
+
+    container.innerHTML = allProjects.map(function(p) {
+      var id = p.id;
+      var name = p.name || '';
+      var desc = p.description || '';
+      var status = p.status || 'planning';
+      var isPub = p.isPublic;
+      var approved = p.clientApproved;
+      var userName = p.userName || '';
+
+      var statusLabels = { planning: 'Planeacion', in_progress: 'En Progreso', completed: 'Completado', maintenance: 'Mantenimiento', archived: 'Archivado' };
+
+      var contentCount = p.content ? p.content.length : 0;
+
+      return '<div class="academy-resource-item">' +
+        '<div class="academy-resource-left">' +
+          '<span class="academy-resource-title">' + escapeHtml(name) + '</span>' +
+          '<p class="academy-resource-desc">' + escapeHtml(desc).substring(0, 100) + '</p>' +
+          '<div class="academy-resource-meta">' +
+            '<span class="project-status-badge project-status-' + status + '">' + (statusLabels[status] || status) + '</span>' +
+            '<span class="project-visibility-badge ' + (isPub ? 'project-visibility-public' : 'project-visibility-private') + '">' + (isPub ? 'Publico' : 'Privado') + '</span>' +
+            (approved ? '<span style="color:#4CAF50;font-size:0.75rem;"><i class="ph-light ph-check"></i> Aprobado</span>' : '') +
+            (userName ? '<span class="project-client-name"><i class="ph-light ph-user"></i> ' + escapeHtml(userName) + '</span>' : '') +
+            (contentCount > 0 ? '<span style="font-size:0.75rem;color:var(--text-muted);"><i class="ph-light ph-paperclip"></i> ' + contentCount + ' archivos</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="academy-resource-right">' +
+          '<div class="academy-resource-actions">' +
+            '<button onclick="projectCRUD.followUp(' + id + ')" title="Seguimiento del proyecto"><i class="ph-light ph-chat-circle-text"></i></button>' +
+            '<button onclick="projectCRUD.edit(' + id + ')"><i class="ph-light ph-pencil-simple"></i></button>' +
+            '<button class="btn-delete" onclick="projectCRUD.remove(' + id + ')"><i class="ph-light ph-trash"></i></button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // --- File upload ---
+  var fileInput = document.getElementById('formFileUpload');
+  var fileProgress = document.getElementById('fileUploadProgress');
+  var imageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+  fileInput.addEventListener('change', function() {
+    var file = fileInput.files[0];
+    if (!file) return;
+
+    var uploadingImage = imageTypes.indexOf(file.type) !== -1;
+    if (uploadingImage && file.size > 5 * 1024 * 1024) {
+      showError('La imagen no puede superar 5MB');
+      fileInput.value = '';
+      return;
+    }
+
+    fileProgress.style.display = 'flex';
+    fileProgress.querySelector('.media-progress-fill').style.width = '30%';
+    fileProgress.querySelector('.media-progress-text').textContent = 'Subiendo...';
+
+    var uploadFn = uploadingImage ? uploadImage : uploadDocument;
+    uploadFn(file).then(function(res) {
+      fileProgress.querySelector('.media-progress-fill').style.width = '100%';
+      if (res.success && res.data) {
+        currentFiles.push({
+          fileName: res.data.fileName || file.name,
+          fileUrl: res.data.url,
+          fileSize: res.data.fileSize || formatFileSize(file.size),
+          fileType: uploadingImage ? (res.data.format || file.type) : (res.data.fileType || file.type),
+          _isNew: true,
+          _isImage: uploadingImage
+        });
+        renderContentFiles();
+        fileProgress.querySelector('.media-progress-text').textContent = 'Archivo subido';
+        setTimeout(function() { fileProgress.style.display = 'none'; }, 1000);
+      } else {
+        fileProgress.querySelector('.media-progress-text').textContent = 'Error al subir';
+        showError(res.message || 'Error al subir archivo');
+        setTimeout(function() { fileProgress.style.display = 'none'; }, 1500);
+      }
+      fileInput.value = '';
+    });
+  });
+
+  function renderContentFiles() {
+    var container = document.getElementById('contentFilesList');
+    if (!currentFiles.length) {
+      container.innerHTML = '<div class="content-files-empty">No hay archivos. Sube imagenes, PDFs o documentos.</div>';
+      return;
+    }
+    container.innerHTML = currentFiles.map(function(f, i) {
+      var isImage = f._isImage || (f.fileType && f.fileType.indexOf('image') !== -1 && f.fileType !== 'image/thumbnail');
+      var isThumb = f._isThumbnail || (thumbnailIndex === i);
+      var nonThumbIdx = currentFiles.filter(function(x) { return !x._isThumbnail; }).indexOf(f);
+      var placeholderTag = isThumb ? '' : '{{file:' + nonThumbIdx + '}}';
+
+      var icon = 'ph-file-text';
+      if (f.fileType && f.fileType.indexOf('pdf') !== -1) icon = 'ph-file-pdf';
+      else if (f.fileType && f.fileType.indexOf('spreadsheet') !== -1) icon = 'ph-file-spreadsheet';
+      else if (f.fileType && f.fileType.indexOf('word') !== -1) icon = 'ph-file-doc';
+      else if (f.fileType && f.fileType.indexOf('zip') !== -1) icon = 'ph-file-zip';
+      else if (isImage) icon = 'ph-image';
+
+      var imageClass = isImage ? ' content-file-item--image' : '';
+      var thumbClass = isThumb ? ' content-file-item--thumbnail' : '';
+
+      var html = '<div class="content-file-item' + imageClass + thumbClass + '" data-index="' + i + '">';
+      if (isImage && f.fileUrl) {
+        html += '<img class="content-file-thumb-preview" src="' + f.fileUrl + '" alt="">';
+      }
+      html += '<div class="content-file-info">' +
+        '<i class="ph-light ' + icon + '"></i>' +
+        '<span class="content-file-name">' + escapeHtml(f.fileName) + '</span>' +
+        '<span class="content-file-size">' + escapeHtml(f.fileSize) + '</span>' +
+      '</div>';
+      html += '<textarea class="content-file-description" data-index="' + i + '" placeholder="Descripcion del archivo (opcional)" rows="2">' + escapeHtml(f.description || f.Description || '') + '</textarea>';
+      html += '<div class="content-file-actions">';
+      html += '<button type="button" class="content-file-move" data-action="move-up" data-index="' + i + '" title="Subir"><i class="ph-light ph-caret-up"></i></button>';
+      html += '<button type="button" class="content-file-move" data-action="move-down" data-index="' + i + '" title="Bajar"><i class="ph-light ph-caret-down"></i></button>';
+      if (!isThumb && placeholderTag) {
+        html += '<button type="button" class="content-file-placeholder" data-placeholder="' + placeholderTag + '" title="Copiar ' + placeholderTag + '"><i class="ph-light ph-link"></i></button>';
+      }
+      if (isImage) {
+        html += '<button type="button" class="content-file-thumb' + (isThumb ? ' active' : '') + '" data-action="thumb" data-index="' + i + '" title="Usar como portada"><i class="ph-light ph-star' + (isThumb ? '-fill' : '') + '"></i></button>';
+      }
+      html += '<button type="button" class="content-file-remove" data-action="remove" data-index="' + i + '"><i class="ph-light ph-trash"></i></button>';
+      html += '</div>';
+      html += '</div>';
+      return html;
+    }).join('');
+
+    container.querySelectorAll('[data-action="move-up"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        if (idx > 0) { swapFiles(idx, idx - 1); }
+      });
+    });
+    container.querySelectorAll('[data-action="move-down"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        if (idx < currentFiles.length - 1) { swapFiles(idx, idx + 1); }
+      });
+    });
+    container.querySelectorAll('.content-file-placeholder').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var tag = btn.getAttribute('data-placeholder');
+        if (tag) {
+          navigator.clipboard.writeText(tag).then(function() {
+            showError('Placeholder ' + tag + ' copiado al portapapeles');
+          }).catch(function() {
+            var ta = document.createElement('textarea');
+            ta.value = tag;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showError('Placeholder ' + tag + ' copiado');
+          });
+        }
+      });
+    });
+    container.querySelectorAll('[data-action="thumb"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        setThumbnail(idx);
+      });
+    });
+
+    container.querySelectorAll('[data-action="remove"]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.getAttribute('data-index'));
+        currentFiles.splice(idx, 1);
+        if (thumbnailIndex === idx) {
+          thumbnailIndex = -1;
+          for (var j = 0; j < currentFiles.length; j++) {
+            var isImg = currentFiles[j]._isImage || (currentFiles[j].fileType && currentFiles[j].fileType.indexOf('image') !== -1 && currentFiles[j].fileType !== 'image/thumbnail');
+            if (isImg) {
+              thumbnailIndex = j;
+              currentFiles[j]._isThumbnail = true;
+              break;
+            }
+          }
+        } else if (thumbnailIndex > idx) {
+          thumbnailIndex--;
+        }
+        renderContentFiles();
+      });
+    });
+    container.querySelectorAll('.content-file-description').forEach(function(ta) {
+      ta.addEventListener('input', function() {
+        var idx = parseInt(ta.getAttribute('data-index'));
+        if (currentFiles[idx]) { currentFiles[idx].description = ta.value; }
+      });
+    });
+  }
+
+  function setThumbnail(idx) {
+    thumbnailIndex = idx;
+    currentFiles.forEach(function(f, i) {
+      f._isThumbnail = (i === idx);
+    });
+    renderContentFiles();
+  }
+
+  function swapFiles(a, b) {
+    var tmp = currentFiles[a];
+    currentFiles[a] = currentFiles[b];
+    currentFiles[b] = tmp;
+    if (thumbnailIndex === a) thumbnailIndex = b;
+    else if (thumbnailIndex === b) thumbnailIndex = a;
+    renderContentFiles();
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  // --- Modal open/close ---
+  function openModal(data) {
+    form.reset();
+    formError.style.display = 'none';
+    document.getElementById('formId').value = '';
+    document.getElementById('modalTitle').textContent = 'Nuevo Proyecto';
+    currentFiles = [];
+    thumbnailIndex = -1;
+    editingProjectId = null;
+    originalContentIds = [];
+    renderContentFiles();
+
+    // Load clients for the dropdown
+    getClients().then(function(clients) {
+      var sel = document.getElementById('formIdUser');
+      sel.innerHTML = '<option value="">Ninguno</option>';
+      (clients || []).forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name + ' (' + c.email + ')';
+        sel.appendChild(opt);
+      });
+      if (data) {
+        var selectedId = data.idUser || data.Id_User;
+        if (selectedId) sel.value = selectedId;
+      }
+    });
+
+    if (data) {
+      var id = data.id || data.Id_Project;
+      editingProjectId = id;
+      document.getElementById('formId').value = id;
+      document.getElementById('modalTitle').textContent = 'Editar Proyecto';
+      document.getElementById('formName').value = data.name || data.Name || '';
+      document.getElementById('formDescription').value = data.description || data.Description || '';
+      document.getElementById('formStatus').value = data.status || data.Status || 'planning';
+      document.getElementById('formIsPublic').value = (data.isPublic !== undefined ? data.isPublic : (data.IsPublic !== undefined ? data.IsPublic : false)).toString();
+      document.getElementById('formIdUser').value = data.idUser || data.Id_User || '';
+      if (data.startDate || data.StartDate) {
+        var sd = new Date(data.startDate || data.StartDate);
+        document.getElementById('formStartDate').value = sd.toISOString().split('T')[0];
+      }
+      if (data.endDate || data.EndDate) {
+        var ed = new Date(data.endDate || data.EndDate);
+        document.getElementById('formEndDate').value = ed.toISOString().split('T')[0];
+      }
+
+      // Load content files
+      if (data.content && data.content.length) {
+        var thumbFound = false;
+        data.content.forEach(function(c) {
+          var cid = c.id || c.Id_ProjectContent;
+          originalContentIds.push(cid);
+          var cFileType = c.fileType || c.FileType || '';
+          var cFileName = c.fileName || c.FileName || '';
+          var isThumb = cFileType === 'image/thumbnail' || cFileName === '_thumbnail_';
+          var isImg = cFileType.indexOf('image') !== -1 || isImageByExtension(cFileName);
+          if (isThumb) {
+            thumbnailIndex = currentFiles.length;
+            thumbFound = true;
+            currentFiles.push({
+              id: cid,
+              fileName: cFileName,
+              fileUrl: c.fileUrl || c.FileUrl,
+              fileSize: c.fileSize || c.FileSize,
+              fileType: cFileType,
+              description: c.description || c.Description || '',
+              _existing: true,
+              _isImage: isImg,
+              _isThumbnail: true
+            });
+          } else {
+            currentFiles.push({
+              id: cid,
+              fileName: cFileName,
+              fileUrl: c.fileUrl || c.FileUrl,
+              fileSize: c.fileSize || c.FileSize,
+              fileType: cFileType,
+              description: c.description || c.Description || '',
+              _existing: true,
+              _isImage: isImg,
+              _isThumbnail: false
+            });
+          }
+        });
+        renderContentFiles();
+      }
+
+      // Set BodyHtml
+      var bodyHtml = data.bodyHtml || data.BodyHtml || '';
+      document.getElementById('formBodyHtml').value = bodyHtml;
+    }
+
+    // Init CKEditor
+    if (typeof CKEDITOR !== 'undefined') {
+      if (CKEDITOR.instances.formBodyHtml) { CKEDITOR.instances.formBodyHtml.destroy(); }
+      CKEDITOR.replace('formBodyHtml', {
+        height: 400,
+        removePlugins: 'flash,iframe,forms,newpage,print,preview,templates',
+        toolbar: [
+          { name: 'basicstyles', items: ['Bold','Italic','Underline','Strike','Subscript','Superscript','RemoveFormat','CopyFormatting'] },
+          { name: 'paragraph', items: ['NumberedList','BulletedList','Outdent','Indent','IndentBlock','Blockquote','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'] },
+          { name: 'colors', items: ['TextColor','BGColor'] },
+          { name: 'links', items: ['Link','Unlink'] },
+          { name: 'insert', items: ['Table','HorizontalRule','SpecialChar'] },
+          { name: 'styles', items: ['Format','Font','FontSize'] },
+          { name: 'tools', items: ['Maximize','Source','ShowBlocks'] }
+        ],
+        contentsCss: '/public/css/ckeditor-contents.css',
+        bodyClass: 'ckeditor-body',
+        font_names: 'Arial/Arial, Helvetica, sans-serif;Comic Sans MS/Comic Sans MS, cursive;Courier New/Courier New, Courier, monospace;Georgia/Georgia, serif;Lucida Sans Unicode/Lucida Sans Unicode, Lucida Grande, sans-serif;Tahoma/Tahoma, Geneva, sans-serif;Times New Roman/Times New Roman, Times, serif;Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;Verdana/Verdana, Geneva, sans-serif',
+        font_defaultLabel: 'Arial',
+        fontSize_defaultLabel: '14',
+        fontSize_sizes: '8/8px;9/9px;10/10px;11/11px;12/12px;13/13px;14/14px;15/15px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;42/42px;48/48px;60/60px;72/72px',
+        format_tags: 'p;h1;h2;h3;h4;h5;h6;pre;div',
+        resize_enabled: true,
+        allowedContent: true
+      });
+    }
+    modal.style.display = 'flex';
+  }
+
+  function isImageByExtension(fileName) {
+    if (!fileName) return false;
+    var ext = fileName.split('.').pop().toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].indexOf(ext) !== -1;
+  }
+
+  function closeModal() {
+    if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.formBodyHtml) {
+      CKEDITOR.instances.formBodyHtml.destroy();
+    }
+    modal.style.display = 'none';
+  }
+
+  // --- Form submit ---
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var id = document.getElementById('formId').value;
+
+    var startDate = document.getElementById('formStartDate').value;
+    var endDate = document.getElementById('formEndDate').value;
+
+    var thumbnailUrl = (thumbnailIndex >= 0 && currentFiles[thumbnailIndex]) ? currentFiles[thumbnailIndex].fileUrl : '';
+
+    var payload = {
+      Name: document.getElementById('formName').value,
+      Description: document.getElementById('formDescription').value,
+      ImageUrl: thumbnailUrl,
+      Status: document.getElementById('formStatus').value,
+      IsPublic: document.getElementById('formIsPublic').value === 'true',
+      Id_User: document.getElementById('formIdUser').value ? parseInt(document.getElementById('formIdUser').value) : null,
+      StartDate: startDate ? new Date(startDate).toISOString() : null,
+      EndDate: endDate ? new Date(endDate).toISOString() : null,
+      BodyHtml: (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.formBodyHtml)
+        ? CKEDITOR.instances.formBodyHtml.getData()
+        : document.getElementById('formBodyHtml').value
+    };
+
+    var btn = document.getElementById('btnSaveProject');
+    btn.querySelector('.btn-text').style.display = 'none';
+    btn.querySelector('.btn-loading').style.display = 'inline';
+    btn.disabled = true;
+
+    var promise = id ? updateProject(id, payload) : createProject(payload);
+    promise.then(function(res) {
+      if (res.success === false) {
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loading').style.display = 'none';
+        btn.disabled = false;
+        formError.textContent = res.message;
+        formError.style.display = 'block';
+        return;
+      }
+
+      var projectId = id || (res.data ? res.data.id : null);
+      if (!projectId) {
+        closeModal();
+        loadProjects();
+        return;
+      }
+
+      // Delete all existing content and recreate
+      var deletePromises = [];
+      originalContentIds.forEach(function(oid) {
+        deletePromises.push(deleteProjectContent(oid));
+      });
+
+      Promise.all(deletePromises).then(function() {
+        var filePromises = [];
+
+        // Save thumbnail as content (FileName='_thumbnail_', FileType='image/thumbnail')
+        if (thumbnailIndex >= 0 && currentFiles[thumbnailIndex]) {
+          var thumbFile = currentFiles[thumbnailIndex];
+          filePromises.push(addProjectContent(projectId, {
+            FileName: '_thumbnail_',
+            FileUrl: thumbFile.fileUrl,
+            FileSize: '0',
+            FileType: 'image/thumbnail',
+            Description: thumbFile.description || '',
+            SortOrder: 0
+          }));
+        }
+
+        // Save all non-thumbnail files with current descriptions
+        currentFiles.filter(function(f) { return !f._isThumbnail; }).forEach(function(f) {
+          var sortIdx = currentFiles.indexOf(f);
+          filePromises.push(addProjectContent(projectId, {
+            FileName: f.fileName,
+            FileUrl: f.fileUrl,
+            FileSize: f.fileSize,
+            FileType: f.fileType,
+            Description: f.description || '',
+            SortOrder: sortIdx
+          }));
+        });
+
+        return Promise.all(filePromises);
+      }).then(function() {
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loading').style.display = 'none';
+        btn.disabled = false;
+        closeModal();
+        loadProjects();
+      });
+    });
+  });
+
+  // --- Event listeners ---
+  document.getElementById('btnCreateProject').addEventListener('click', function() { openModal(null); });
+  document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+  document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+
+  // --- Confirm Modal ---
+  var confirmModal = document.getElementById('confirmModal');
+  var confirmCallback = null;
+
+  function showConfirm(message, callback) {
+    document.getElementById('confirmMessage').textContent = message;
+    confirmCallback = callback;
+    confirmModal.style.display = 'flex';
+  }
+
+  function closeConfirm() {
+    confirmModal.style.display = 'none';
+    confirmCallback = null;
+  }
+
+  document.getElementById('btnConfirmClose').addEventListener('click', closeConfirm);
+  document.getElementById('btnConfirmCancel').addEventListener('click', closeConfirm);
+  confirmModal.addEventListener('click', function(e) {
+    if (e.target === confirmModal) closeConfirm();
+  });
+  document.getElementById('btnConfirmAccept').addEventListener('click', function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+  });
+
+  window.projectCRUD = {
+    followUp: function(id) {
+      window.location.hash = '#/projects/' + id;
+    },
+    edit: function(id) {
+      var project = allProjects.find(function(p) { return (p.id) === id; });
+      if (project) openModal(project);
+    },
+    remove: function(id) {
+      showConfirm('¿Eliminar este proyecto y todo su contenido?', function() {
+        deleteProject(id).then(function(res) {
+          if (res.success !== false) loadProjects();
+        });
+      });
+    }
+  };
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  loadProjects();
+})();
+</script>

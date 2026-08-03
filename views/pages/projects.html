@@ -1,0 +1,150 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal" style="text-align:center;">
+      <div>
+        <h1 class="dashboard-greeting">Nuestros <span class="gold-text">Proyectos</span></h1>
+        <p class="dashboard-subtitle">Conoce los trabajos que hemos realizado</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <a href="#/dashboard" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> Dashboard
+        </a>
+      </div>
+    </div>
+
+    <div class="portfolio-filters reveal reveal-delay-1">
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="planning">Planeacion</button>
+      <button class="filter-btn" data-filter="in_progress">En Progreso</button>
+      <button class="filter-btn" data-filter="completed">Completados</button>
+      <button class="filter-btn" data-filter="maintenance">Mantenimiento</button>
+    </div>
+
+    <div id="projectsGrid" class="portfolio-grid reveal reveal-delay-2">
+      <div class="academy-list-empty" style="grid-column:1/-1;">
+        <i class="ph-light ph-briefcase"></i>
+        <p>Cargando proyectos...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var allProjects = [];
+  var currentFilter = 'all';
+  var testimonialByProject = {};
+
+  function loadProjects() {
+    getProjects().then(function(data) {
+      allProjects = data || [];
+      getTestimonials().then(function(testimonials) {
+        testimonialByProject = {};
+        (testimonials || []).forEach(function(t) { testimonialByProject[t.projectId] = t; });
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid() {
+    var grid = document.getElementById('projectsGrid');
+    var filtered = currentFilter === 'all'
+      ? allProjects
+      : allProjects.filter(function(p) { return (p.status) === currentFilter; });
+
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="academy-list-empty" style="grid-column:1/-1;"><i class="ph-light ph-briefcase"></i><p>No hay proyectos disponibles</p></div>';
+      return;
+    }
+
+    var statusLabels = { planning: 'Planeacion', in_progress: 'En Progreso', completed: 'Completado', maintenance: 'Mantenimiento', archived: 'Archivado' };
+
+    grid.innerHTML = filtered.map(function(p) {
+      var imgHtml = p.imageUrl
+        ? '<img class="portfolio-item-image" src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '">'
+        : '<div class="portfolio-item-placeholder"><i class="ph-light ph-briefcase"></i></div>';
+
+      var t = testimonialByProject[p.id];
+      var testimonialHtml = '';
+      if (t) {
+        testimonialHtml =
+          '<span class="stars-display" data-stars="' + p.id + '"></span>' +
+          '<p class="testimonial-snippet">"' + escapeHtml((t.content || '').substring(0, 120)) + '"</p>';
+      }
+
+      var user = getLocalStorage('DyT_EG_user');
+      var canManage = user && (p.idUser === user.id || user.role === 'admin');
+      var actionsHtml = '';
+      if (canManage) {
+        var visible = !!p.clientApproved;
+        actionsHtml = '<button type="button" class="vis-toggle" data-project="' + p.id + '" data-approved="' + (visible ? 'true' : 'false') + '">' +
+          '<span class="vis-toggle-switch"><span class="vis-toggle-knob"></span></span>' +
+          '<span class="vis-toggle-text">' + (visible ? 'Ocultar visibilidad' : 'Permitir visibilidad') + '</span>' +
+        '</button>';
+      }
+
+      return '<div class="portfolio-item">' +
+        '<a href="#/projects/' + p.id + '" class="portfolio-item-link">' +
+          imgHtml +
+          '<div class="portfolio-item-info">' +
+            '<h3 class="portfolio-item-name">' + escapeHtml(p.name) + '</h3>' +
+            '<p class="portfolio-item-desc">' + escapeHtml((p.description || '').substring(0, 200)) + '</p>' +
+            testimonialHtml +
+            '<span class="portfolio-item-status portfolio-status-' + p.status + '">' + (statusLabels[p.status] || p.status) + '</span>' +
+          '</div>' +
+        '</a>' +
+        (actionsHtml ? '<div class="dashboard-project-actions portfolio-item-actions">' + actionsHtml + '</div>' : '') +
+      '</div>';
+    }).join('');
+
+    grid.querySelectorAll('[data-stars]').forEach(function(el) {
+      var t = testimonialByProject[el.getAttribute('data-stars')];
+      if (t) renderStars(el, t.rating);
+    });
+
+    requestAnimationFrame(function() {
+      if (window.initScrollReveal) initScrollReveal();
+    });
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(f) { f.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      renderGrid();
+    });
+  });
+
+  var grid = document.getElementById('projectsGrid');
+  grid.addEventListener('click', function(e) {
+    var target = e.target;
+    if (!target || !target.closest) return;
+    var toggle = target.closest('.vis-toggle');
+    if (!toggle) return;
+    var pid = toggle.getAttribute('data-project');
+    var newState = toggle.getAttribute('data-approved') !== 'true';
+    toggle.disabled = true;
+    approveProject(pid, newState).then(function(res) {
+      toggle.disabled = false;
+      if (res.success !== false) {
+        var proj = allProjects.find(function(x) { return String(x.id) === String(pid); });
+        if (proj) proj.clientApproved = newState;
+        renderGrid();
+      } else {
+        showError(res.message || 'Error al cambiar la visibilidad del proyecto');
+      }
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  loadProjects();
+})();
+</script>

@@ -1,0 +1,162 @@
+<!-- Contact Section - Dark Luxury -->
+<section id="contacto" style="padding: var(--section-padding) 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <span class="eyebrow reveal">
+        <i class="ph-light ph-paper-plane-tilt"></i>
+        Contacto
+      </span>
+      <h2 class="reveal reveal-delay-1" style="margin-bottom: 1rem;">Cotiza tu proyecto</h2>
+      <p class="reveal reveal-delay-2" style="margin: 0 auto; max-width: 520px;">
+        Cuéntanos sobre tu proyecto y te responderemos en menos de 24 horas.
+      </p>
+    </div>
+
+    <div class="contact-grid">
+      <!-- Form -->
+      <div class="card-bezel reveal reveal-delay-1">
+        <div class="card-bezel-inner">
+          <form id="contactForm" class="contact-form">
+            <div class="form-group">
+              <label for="name" class="form-label">Nombre</label>
+              <input type="text" id="name" name="name" class="form-input" placeholder="Tu nombre" required>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" id="email" name="email" class="form-input" placeholder="tu@email.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="projectType" class="form-label">Tipo de Proyecto</label>
+              <div class="form-select-wrapper">
+                <select id="projectType" name="projectType" class="form-select">
+                  <option value="" disabled selected>Selecciona una opción</option>
+                  <option value="landing">Landing Page</option>
+                  <option value="webapp">Web App</option>
+                  <option value="ecommerce">E-commerce</option>
+                  <option value="dashboard">Dashboard</option>
+                  <option value="api">API / Backend</option>
+                  <option value="other">Otro</option>
+                </select>
+                <i class="ph-light ph-caret-down form-select-icon"></i>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="budget" class="form-label">Presupuesto</label>
+              <div class="form-select-wrapper">
+                <select id="budget" name="budget" class="form-select">
+                  <option value="" disabled selected>Rango de presupuesto</option>
+                  <option value="500-1000">$500 - $1,000</option>
+                  <option value="1000-2000">$1,000 - $2,000</option>
+                  <option value="2000-5000">$2,000 - $5,000</option>
+                  <option value="5000+">$5,000+</option>
+                </select>
+                <i class="ph-light ph-caret-down form-select-icon"></i>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="message" class="form-label">Cuéntanos sobre tu proyecto</label>
+              <textarea id="message" name="message" class="form-textarea" rows="5" placeholder="Describe tu proyecto, objetivos y requisitos..."></textarea>
+            </div>
+
+            <div class="form-group" style="display:flex;justify-content:center;align-items: center;">
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAAD-ll4MBRA3lg5Bf" data-theme="dark"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+              <span>Enviar Mensaje</span>
+              <span class="btn-icon"><i class="ph-light ph-paper-plane-tilt"></i></span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="contact-info reveal reveal-delay-2">
+        <div class="contact-info-card">
+          <div class="icon-orb" style="margin-bottom: 1.25rem;">
+            <i class="ph-light ph-clock"></i>
+          </div>
+          <h3 style="margin-bottom: 0.5rem; font-size: 1.125rem;">Respuesta Rápida</h3>
+          <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">
+            Respondemos en menos de 24 horas. Proyectos urgentes bajo disponibilidad.
+          </p>
+        </div>
+
+        <div class="contact-info-card">
+          <div class="icon-orb icon-orb-warm" style="margin-bottom: 1.25rem;">
+            <i class="ph-light ph-shield-check"></i>
+          </div>
+          <h3 style="margin-bottom: 0.5rem; font-size: 1.125rem;">Garantía Total</h3>
+          <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">
+            Si no estás satisfecho, trabajamos hasta que lo estés. Tu satisfacción es nuestra prioridad.
+          </p>
+        </div>
+
+        <div class="contact-info-card">
+          <div class="icon-orb icon-orb-secondary" style="margin-bottom: 1.25rem;">
+            <i class="ph-light ph-handshake"></i>
+          </div>
+          <h3 style="margin-bottom: 0.5rem; font-size: 1.125rem;">Sin Compromiso</h3>
+          <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">
+            La cotización es gratuita y sin obligación. Conoce el alcance antes de decidir.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var form = document.getElementById('contactForm');
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var turnstileToken = DyTTurnstile.getToken();
+    if (!turnstileToken) {
+      showError('Completa la verificación de seguridad');
+      return;
+    }
+
+    var btn = form.querySelector('button[type="submit"]');
+    var btnText = btn.querySelector('span:first-child');
+    var btnIcon = btn.querySelector('.btn-icon');
+    var originalText = btnText.textContent;
+
+    btnText.textContent = 'Enviando...';
+    btn.disabled = true;
+
+    var payload = {
+      Name: document.getElementById('name').value,
+      Email: document.getElementById('email').value,
+      ProjectType: document.getElementById('projectType').value || '',
+      Budget: document.getElementById('budget').value || '',
+      Message: document.getElementById('message').value,
+      TurnstileToken: turnstileToken
+    };
+
+    submitContact(payload).then(function(res) {
+      if (res.success) {
+        btnText.textContent = 'Enviado';
+        form.reset();
+        DyTTurnstile.reset();
+        setTimeout(function() {
+          btnText.textContent = originalText;
+          btn.disabled = false;
+        }, 2000);
+      } else {
+        btnText.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+  });
+})();
+</script>

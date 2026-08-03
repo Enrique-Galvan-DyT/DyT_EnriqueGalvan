@@ -1,0 +1,187 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Todos los <span class="gold-text">Tickets</span></h1>
+        <p class="dashboard-subtitle">Gestiona los tickets del sistema</p>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <a href="#/admin" class="btn btn-secondary">
+          <i class="ph-light ph-arrow-left"></i> Volver
+        </a>
+      </div>
+    </div>
+
+    <div class="tickets-filters reveal reveal-delay-1">
+      <div class="tickets-filter-group">
+        <label class="form-label">Estado</label>
+        <select id="filterStatus" class="form-select">
+          <option value="">Todos</option>
+          <option value="open">Abierto</option>
+          <option value="in_progress">En Progreso</option>
+          <option value="resolved">Resuelto</option>
+          <option value="closed">Cerrado</option>
+        </select>
+      </div>
+      <div class="tickets-filter-group">
+        <label class="form-label">Categoria</label>
+        <select id="filterCategory" class="form-select">
+          <option value="">Todas</option>
+          <option value="incident">Incidente</option>
+          <option value="improvement">Mejora</option>
+          <option value="support">Soporte</option>
+          <option value="other">Otro</option>
+        </select>
+      </div>
+      <div class="tickets-filter-group">
+        <label class="form-label">Prioridad</label>
+        <select id="filterPriority" class="form-select">
+          <option value="">Todas</option>
+          <option value="low">Baja</option>
+          <option value="medium">Media</option>
+          <option value="high">Alta</option>
+          <option value="urgent">Urgente</option>
+        </select>
+      </div>
+      <div class="tickets-filter-group tickets-filter-group--search">
+        <label class="form-label">Buscar</label>
+        <div class="form-input-wrapper">
+          <i class="ph-light ph-magnifying-glass form-input-icon"></i>
+          <input type="text" id="filterSearch" class="form-input" placeholder="Buscar tickets...">
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-table-container reveal reveal-delay-2">
+      <table class="admin-table" id="adminTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Titulo</th>
+            <th>Usuario</th>
+            <th>Proyecto</th>
+            <th>Categoria</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody">
+          <tr><td colspan="9" class="tickets-loading">
+            <div>
+              <div>
+                <i class="ph-light ph-spinner"></i> 
+              </div>
+              <div>
+                <span>Cargando tickets...</span>
+              </div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  function loadTickets() {
+    var filters = {};
+    var status = document.getElementById('filterStatus').value;
+    var category = document.getElementById('filterCategory').value;
+    var priority = document.getElementById('filterPriority').value;
+    var search = document.getElementById('filterSearch').value.trim();
+
+    if (status) filters.status = status;
+    if (category) filters.category = category;
+    if (priority) filters.priority = priority;
+    if (search) filters.search = search;
+
+    getAdminTickets(filters).then(function(data) {
+      var tickets = data.tickets || data || [];
+      renderTable(tickets);
+    });
+  }
+
+  function renderTable(tickets) {
+    var tbody = document.getElementById('adminTableBody');
+    if (!tickets.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="tickets-empty">No se encontraron tickets</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = tickets.map(function(t) {
+      return '<tr>' +
+        '<td><span class="table-id">#' + t.id + '</span></td>' +
+        '<td><a href="#/tickets/' + t.id + '" class="table-title">' + escapeHtml(t.title) + '</a></td>' +
+        '<td>' + escapeHtml(t.userName || '-') + '</td>' +
+        '<td>' + (t.projectName ? '<span class="badge badge-rose">' + escapeHtml(t.projectName) + '</span>' : '<span style="color:var(--text-muted);font-size:0.75rem;">—</span>') + '</td>' +
+        '<td><span class="badge badge-secondary">' + categoryLabel(t.category) + '</span></td>' +
+        '<td><span class="badge ticket-priority-' + t.priority + '">' + priorityLabel(t.priority) + '</span></td>' +
+        '<td><span class="badge ticket-status-' + t.status + '">' + statusLabel(t.status) + '</span></td>' +
+        '<td>' + formatDate(t.createdAt) + '</td>' +
+        '<td>' +
+          '<div class="table-actions">' +
+            '<select class="form-select form-select-sm table-status-select" data-id="' + t.id + '">' +
+              '<option value="open"' + (t.status === 'open' ? ' selected' : '') + '>Abierto</option>' +
+              '<option value="in_progress"' + (t.status === 'in_progress' ? ' selected' : '') + '>En Progreso</option>' +
+              '<option value="resolved"' + (t.status === 'resolved' ? ' selected' : '') + '>Resuelto</option>' +
+              '<option value="closed"' + (t.status === 'closed' ? ' selected' : '') + '>Cerrado</option>' +
+            '</select>' +
+          '</div>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.querySelectorAll('.table-status-select').forEach(function(select) {
+      select.addEventListener('change', function() {
+        var id = this.getAttribute('data-id');
+        updateTicketStatus(id, this.value).then(function() {
+          loadTickets();
+        });
+      });
+    });
+  }
+
+  function statusLabel(s) {
+    var map = { open: 'Abierto', in_progress: 'En Progreso', resolved: 'Resuelto', closed: 'Cerrado' };
+    return map[s] || s;
+  }
+
+  function priorityLabel(p) {
+    var map = { low: 'Baja', medium: 'Media', high: 'Alta', urgent: 'Urgente' };
+    return map[p] || p;
+  }
+
+  function categoryLabel(c) {
+    var map = { incident: 'Incidente', improvement: 'Mejora', support: 'Soporte', other: 'Otro' };
+    return map[c] || c;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  document.getElementById('filterStatus').addEventListener('change', loadTickets);
+  document.getElementById('filterCategory').addEventListener('change', loadTickets);
+  document.getElementById('filterPriority').addEventListener('change', loadTickets);
+
+  var searchTimeout;
+  document.getElementById('filterSearch').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(loadTickets, 300);
+  });
+
+  loadTickets();
+})();
+</script>

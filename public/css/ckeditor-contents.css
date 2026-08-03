@@ -1,0 +1,94 @@
+.ckeditor-body {
+  background: #0C0C0C;
+  color: #D4C5A9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  padding: 0 1px;
+}
+.ckeditor-body p {
+  margin: 0 0 1em;
+}
+.ckeditor-body h3 {
+  color: #C9A84C;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.4em;
+  font-weight: 600;
+  margin: 1.5em 0 0.5em;
+}
+.ckeditor-body h4 {
+  color: #E8DCC8;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.15em;
+  font-weight: 600;
+  margin: 1.2em 0 0.4em;
+}
+.ckeditor-body h5 {
+  color: #D4C5A9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1em;
+  font-weight: 600;
+  margin: 1em 0 0.3em;
+}
+.ckeditor-body a {
+  color: #C9A84C;
+  text-decoration: underline;
+}
+.ckeditor-body a:hover {
+  color: #D4B95A;
+}
+.ckeditor-body ul,
+.ckeditor-body ol {
+  margin: 0 0 1em;
+  padding-left: 1.5em;
+}
+.ckeditor-body li {
+  margin-bottom: 0.3em;
+}
+.ckeditor-body blockquote {
+  border-left: 3px solid #C9A84C;
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  font-style: italic;
+  color: #B8A98A;
+  background: rgba(201, 168, 76, 0.04);
+}
+.ckeditor-body strong {
+  color: #E8DCC8;
+  font-weight: 600;
+}
+.ckeditor-body em {
+  font-style: italic;
+}
+.ckeditor-body u {
+  text-decoration: underline;
+}
+.ckeditor-body code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 0.85em;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  color: #E8DCC8;
+}
+.ckeditor-body hr {
+  border: none;
+  border-top: 1px solid rgba(201, 168, 76, 0.2);
+  margin: 1.5em 0;
+}
+.ckeditor-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+.ckeditor-body th,
+.ckeditor-body td {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+.ckeditor-body th {
+  background: rgba(201, 168, 76, 0.08);
+  color: #C9A84C;
+  font-weight: 600;
+}

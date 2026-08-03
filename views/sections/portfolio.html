@@ -1,0 +1,113 @@
+<section id="portafolio" style="padding: var(--section-padding) 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <span class="eyebrow reveal">
+        <i class="ph-light ph-briefcase"></i>
+        Portafolio
+      </span>
+      <h2 class="reveal reveal-delay-1" style="margin-bottom: 1rem;">Proyectos destacados</h2>
+      <p class="reveal reveal-delay-2" style="margin: 0 auto; max-width: 520px;">
+        Una selección de nuestros proyectos reales, visibles según su etapa: completados, en progreso o en mantenimiento.
+      </p>
+    </div>
+
+    <div class="portfolio-filters reveal reveal-delay-2">
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="completed">Completados</button>
+      <button class="filter-btn" data-filter="in_progress">En Progreso</button>
+      <button class="filter-btn" data-filter="maintenance">Mantenimiento</button>
+    </div>
+
+    <div class="portfolio-grid" id="portfolioGrid">
+      <div class="academy-list-empty" style="grid-column:1/-1;padding:3rem;">
+        <i class="ph-light ph-spinner" style="font-size:1.5rem;"></i>
+        <p>Cargando proyectos...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+(function() {
+  var allProjects = [];
+  var currentFilter = 'all';
+  var testimonialByProject = {};
+
+  function loadPortfolio() {
+    getProjects().then(function(data) {
+      allProjects = (data || []).filter(function(p) { return p.isPublic && (p.clientApproved || !p.idUser); });
+      getTestimonials().then(function(testimonials) {
+        testimonialByProject = {};
+        (testimonials || []).forEach(function(t) { testimonialByProject[t.projectId] = t; });
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid() {
+    var grid = document.getElementById('portfolioGrid');
+    var filtered = currentFilter === 'all'
+      ? allProjects
+      : allProjects.filter(function(p) { return p.status === currentFilter; });
+
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="academy-list-empty" style="grid-column:1/-1;padding:3rem;"><i class="ph-light ph-briefcase"></i><p>No hay proyectos disponibles</p></div>';
+      return;
+    }
+
+    var statusLabels = { planning: 'Planeación', in_progress: 'En Progreso', completed: 'Completado', maintenance: 'Mantenimiento', archived: 'Archivado' };
+
+    grid.innerHTML = filtered.map(function(p) {
+      var imgHtml = p.imageUrl
+        ? '<img class="portfolio-item-image" src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '">'
+        : '<div class="portfolio-item-placeholder"><i class="ph-light ph-briefcase"></i></div>';
+
+      var t = testimonialByProject[p.id];
+      var testimonialHtml = '';
+      if (t) {
+        testimonialHtml =
+          '<span class="stars-display" data-stars="' + p.id + '"></span>' +
+          '<p class="testimonial-snippet">"' + escapeHtml((t.content || '').substring(0, 120)) + '"</p>';
+      }
+
+      return '<a href="#/projects/' + p.id + '" class="portfolio-item">' +
+        imgHtml +
+        '<div class="portfolio-item-info">' +
+          '<h3>' + escapeHtml(p.name) + '</h3>' +
+          '<p>' + escapeHtml((p.description || '').substring(0, 150)) + '</p>' +
+          testimonialHtml +
+          '<span class="portfolio-item-status portfolio-status-' + p.status + '">' + (statusLabels[p.status] || p.status) + '</span>' +
+        '</div>' +
+      '</a>';
+    }).join('');
+
+    grid.querySelectorAll('[data-stars]').forEach(function(el) {
+      var t = testimonialByProject[el.getAttribute('data-stars')];
+      if (t) renderStars(el, t.rating);
+    });
+
+    requestAnimationFrame(function() {
+      if (window.initScrollReveal) initScrollReveal();
+    });
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(f) { f.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      renderGrid();
+    });
+  });
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  loadPortfolio();
+})();
+</script>

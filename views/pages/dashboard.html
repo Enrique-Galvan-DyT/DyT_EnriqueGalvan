@@ -1,0 +1,328 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Hola, <span class="gold-text" id="dashUserName">Usuario</span></h1>
+        <p class="dashboard-subtitle">Bienvenido a tu panel de control</p>
+      </div>
+      <a href="#/tickets/new" class="btn btn-primary">
+        <i class="ph-light ph-plus"></i> Nuevo Ticket
+      </a>
+    </div>
+
+    <div class="dashboard-stats reveal reveal-delay-1">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <i class="ph-light ph-ticket"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statTotal">0</span>
+          <span class="stat-card-label">Total Tickets</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--open">
+          <i class="ph-light ph-circle"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statOpen">0</span>
+          <span class="stat-card-label">Abiertos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--progress">
+          <i class="ph-light ph-clock"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statProgress">0</span>
+          <span class="stat-card-label">En Progreso</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon stat-card-icon--resolved">
+          <i class="ph-light ph-check-circle"></i>
+        </div>
+        <div class="stat-card-info">
+          <span class="stat-card-number" id="statResolved">0</span>
+          <span class="stat-card-label">Resueltos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-section reveal reveal-delay-2">
+        <div class="dashboard-section-header">
+          <h3>Tickets Recientes</h3>
+          <a href="#/tickets" class="dashboard-section-link">Ver todos <i class="ph-light ph-arrow-right"></i></a>
+        </div>
+        <div id="recentTickets" class="ticket-list">
+          <div class="ticket-list-empty">
+            <i class="ph-light ph-ticket"></i>
+            <p>No tienes tickets aún</p>
+            <a href="#/tickets/new" class="btn btn-primary btn-sm">Crear primer ticket</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-section reveal reveal-delay-3">
+        <div class="dashboard-section-header">
+          <h3>Mis Proyectos</h3>
+          <a href="#/projects" class="dashboard-section-link">Ver todos <i class="ph-light ph-arrow-right"></i></a>
+        </div>
+        <div id="userProjects" class="ticket-list">
+          <div class="dashboard-skeleton-list">
+            <div class="dashboard-skeleton-item">
+              <div class="skeleton" style="width:20px;height:20px;border-radius:50%;"></div>
+              <div style="flex:1;">
+                <div class="skeleton skeleton-line"></div>
+                <div class="skeleton skeleton-line" style="width:60%;"></div>
+              </div>
+            </div>
+            <div class="dashboard-skeleton-item">
+              <div class="skeleton" style="width:20px;height:20px;border-radius:50%;"></div>
+              <div style="flex:1;">
+                <div class="skeleton skeleton-line"></div>
+                <div class="skeleton skeleton-line" style="width:60%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-section reveal reveal-delay-4">
+        <div class="dashboard-section-header">
+          <h3>Accesos Rapidos</h3>
+        </div>
+        <div class="quick-actions">
+          <a href="#/tickets/new" class="quick-action-card">
+            <div class="quick-action-icon">
+              <i class="ph-light ph-plus-circle"></i>
+            </div>
+            <span class="quick-action-text">Reportar Incidente</span>
+          </a>
+          <a href="#/tickets/new" class="quick-action-card">
+            <div class="quick-action-icon quick-action-icon--warm">
+              <i class="ph-light ph-lightbulb"></i>
+            </div>
+            <span class="quick-action-text">Solicitar Mejora</span>
+          </a>
+          <a href="#/tickets" class="quick-action-card">
+            <div class="quick-action-icon quick-action-icon--secondary">
+              <i class="ph-light ph-magnifying-glass"></i>
+            </div>
+            <span class="quick-action-text">Ver Historial</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var user = DyTAuth.getUser();
+  if (user) {
+    var nameEl = document.getElementById('dashUserName');
+    if (nameEl) nameEl.textContent = user.name || 'Usuario';
+  }
+
+  // Load user projects (con testimonios y toggle de visibilidad)
+  var projectsContainer = document.getElementById('userProjects');
+  var myProjects = [];
+  var testimonialByProject = {};
+  var statusLabels = { planning: 'Planeacion', in_progress: 'En Progreso', completed: 'Completado', maintenance: 'Mantenimiento' };
+
+  function renderProjects() {
+    if (myProjects.length === 0) {
+      projectsContainer.innerHTML = '<div class="ticket-list-empty">' +
+        '<i class="ph-light ph-briefcase"></i>' +
+        '<p>No tienes proyectos asignados</p>' +
+      '</div>';
+      return;
+    }
+
+    projectsContainer.innerHTML = myProjects.map(function(p) {
+      var t = testimonialByProject[p.id];
+      var actions = '';
+      var visible = !!p.clientApproved;
+      actions += '<button type="button" class="vis-toggle" data-project="' + p.id + '" data-approved="' + (visible ? 'true' : 'false') + '">' +
+        '<span class="vis-toggle-switch"><span class="vis-toggle-knob"></span></span>' +
+        '<span class="vis-toggle-text">' + (visible ? 'Ocultar visibilidad' : 'Permitir visibilidad') + '</span>' +
+      '</button>';
+      if (!t) {
+        actions += '<button type="button" class="btn btn-primary btn-sm btn-valorar" data-project="' + p.id + '"><i class="ph-light ph-star"></i> Valorar proyecto</button>';
+      }
+
+      return '<div class="dashboard-project-card" data-project="' + p.id + '">' +
+        '<a href="#/projects/' + p.id + '" class="dashboard-project-link">' +
+          '<div class="dashboard-project-head">' +
+            '<span class="dashboard-project-name">' + escapeHtml(p.name) + '</span>' +
+            '<span class="ticket-status badge project-status-' + p.status + '" style="background:rgba(201,168,76,0.12);color:var(--accent-primary);font-size:0.75rem;flex-shrink:0;">' + (statusLabels[p.status] || p.status) + '</span>' +
+          '</div>' +
+          '<p class="dashboard-project-desc">' + escapeHtml(p.description || 'Sin descripcion') + '</p>' +
+          (t ? '<span class="stars-display" data-stars="' + p.id + '"></span>' : '') +
+        '</a>' +
+        (actions ? '<div class="dashboard-project-actions">' + actions + '</div>' : '') +
+      '</div>' +
+      '<div class="testimonial-inline" id="testimonialInline-' + p.id + '" style="display:none;"></div>';
+    }).join('');
+
+    myProjects.forEach(function(p) {
+      var t = testimonialByProject[p.id];
+      if (t) renderStars(projectsContainer.querySelector('[data-stars="' + p.id + '"]'), t.rating);
+    });
+  }
+
+  getProjects().then(function(projects) {
+    var user = getLocalStorage('DyT_EG_user');
+    var userId = user ? user.id : null;
+    myProjects = (projects || []).filter(function(p) { return p.idUser === userId; }).slice(0, 5);
+    getTestimonials().then(function(testimonials) {
+      testimonialByProject = {};
+      (testimonials || []).forEach(function(t) { testimonialByProject[t.projectId] = t; });
+      renderProjects();
+    });
+  });
+
+  // Delegacion de acciones de proyectos (una sola vez)
+  projectsContainer.addEventListener('click', function(e) {
+    var target = e.target;
+    if (!target || !target.closest) return;
+
+    var toggle = target.closest('.vis-toggle');
+    if (toggle) {
+      var apid = toggle.getAttribute('data-project');
+      var newState = toggle.getAttribute('data-approved') !== 'true';
+      toggle.disabled = true;
+      approveProject(apid, newState).then(function(res) {
+        toggle.disabled = false;
+        if (res.success !== false) {
+          var proj = myProjects.find(function(x) { return String(x.id) === String(apid); });
+          if (proj) proj.clientApproved = newState;
+          renderProjects();
+        } else {
+          showError(res.message || 'Error al cambiar la visibilidad del proyecto');
+        }
+      });
+      return;
+    }
+
+    var btn = target.closest('.btn-valorar');
+    if (!btn) return;
+        var pid = btn.getAttribute('data-project');
+        var inline = document.getElementById('testimonialInline-' + pid);
+        if (!inline) return;
+
+        if (inline.style.display !== 'none') {
+          inline.style.display = 'none';
+          return;
+        }
+
+        inline.innerHTML =
+          '<div class="testimonial-block">' +
+            '<div class="testimonial-block-header">' +
+              '<p class="testimonial-block-title" style="margin:0;">Valora este proyecto</p>' +
+            '</div>' +
+            '<form class="testimonial-form" id="testimonialForm-' + pid + '">' +
+              '<div class="testimonial-form-field">' +
+                '<label>Tu valoracion</label>' +
+                '<div id="testimonialStars-' + pid + '" class="star-selector"></div>' +
+              '</div>' +
+              '<div class="testimonial-form-field">' +
+                '<label>Tu testimonio</label>' +
+                '<textarea id="testimonialContent-' + pid + '" maxlength="1000" placeholder="Cuenta tu experiencia con este proyecto..."></textarea>' +
+              '</div>' +
+              '<div class="testimonial-form-error" id="testimonialFormError-' + pid + '" style="display:none;"></div>' +
+              '<button type="submit" class="btn btn-primary"><i class="ph-light ph-paper-plane-tilt"></i> Publicar testimonio</button>' +
+            '</form>' +
+          '</div>';
+        inline.style.display = '';
+
+        var stars = document.getElementById('testimonialStars-' + pid);
+        if (typeof renderStarSelector === 'function') renderStarSelector(stars);
+
+        inline.querySelector('form').addEventListener('submit', function(ev) {
+          ev.preventDefault();
+          var errorEl = document.getElementById('testimonialFormError-' + pid);
+          var submitBtn = inline.querySelector('button[type="submit"]');
+          var rating = (typeof stars.getRating === 'function') ? stars.getRating() : 0;
+          var content = document.getElementById('testimonialContent-' + pid).value.trim();
+
+          errorEl.style.display = 'none';
+          if (rating <= 0) {
+            errorEl.textContent = 'Selecciona una valoracion con estrellas';
+            errorEl.style.display = '';
+            return;
+          }
+          if (!content) {
+            errorEl.textContent = 'Escribe tu testimonio';
+            errorEl.style.display = '';
+            return;
+          }
+
+          submitBtn.disabled = true;
+          createTestimonial({ projectId: pid, rating: rating, content: content }).then(function(res) {
+            submitBtn.disabled = false;
+            if (res && res.success) {
+              getProjectTestimonial(pid).then(function(t) {
+                if (t) testimonialByProject[pid] = t;
+                renderProjects();
+              });
+            } else {
+              errorEl.textContent = (res && res.message) || 'Error al publicar el testimonio';
+              errorEl.style.display = '';
+            }
+          });
+        });
+      });
+
+  getUserTickets({ limit: 5 }).then(function(data) {
+    var tickets = data.tickets || data || [];
+    var stats = data.stats || {};
+
+    if (stats.total !== undefined) document.getElementById('statTotal').textContent = stats.total;
+    if (stats.open !== undefined) document.getElementById('statOpen').textContent = stats.open;
+    if (stats.inProgress !== undefined) document.getElementById('statProgress').textContent = stats.inProgress;
+    if (stats.resolved !== undefined) document.getElementById('statResolved').textContent = stats.resolved;
+
+    var container = document.getElementById('recentTickets');
+    if (tickets.length > 0) {
+      container.innerHTML = tickets.map(function(t) {
+        return '<a href="#/tickets/' + t.id + '" class="ticket-list-item">' +
+          '<div class="ticket-list-item-left">' +
+            '<span class="ticket-list-item-title">' + escapeHtml(t.title) + '</span>' +
+            '<span class="ticket-list-item-date">' + formatDate(t.createdAt) + '</span>' +
+          '</div>' +
+          '<div class="ticket-list-item-right">' +
+            '<span class="ticket-priority badge ticket-priority-' + t.priority + '">' + priorityLabel(t.priority) + '</span>' +
+            '<span class="ticket-status badge ticket-status-' + t.status + '">' + statusLabel(t.status) + '</span>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    }
+  });
+
+  function statusLabel(s) {
+    var map = { open: 'Abierto', in_progress: 'En Progreso', resolved: 'Resuelto', closed: 'Cerrado' };
+    return map[s] || s;
+  }
+
+  function priorityLabel(p) {
+    var map = { low: 'Baja', medium: 'Media', high: 'Alta', urgent: 'Urgente' };
+    return map[p] || p;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    var d = new Date(dateStr);
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+})();
+</script>
