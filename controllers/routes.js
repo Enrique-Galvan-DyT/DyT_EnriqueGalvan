@@ -1,4 +1,4 @@
-var envProd = "https://dyteg.bsite.net/"
+var envProd = "https://apidyteg.bsite.net/"
 var envLocal = "https://localhost:44345/"
 
 var env = envProd // Base API URL — configurable por proyecto
@@ -11,6 +11,8 @@ var authVerifyRoute = env + "api/auth/verify/[token]"
 var authPendingRoute = env + "api/auth/pending"
 var authVerifyLinkRoute = env + "api/auth/verify-link/[id]"
 var authActivateRoute = env + "api/auth/activate/[id]"
+var authProfileRoute = env + "api/auth/profile"
+var authPasswordRoute = env + "api/auth/password"
 
 // --- ACADEMY ---
 var getAcademyResourcesRoute = env + "api/academy/resources"
@@ -40,6 +42,7 @@ var paymentCheckoutRoute = env + "api/payment/checkout"
 var paymentStatusRoute = env + "api/payment/status/[id]"
 var paymentWebhookRoute = env + "api/payment/webhook"
 var paymentAdminRoute = env + "api/payment/admin"
+var paymentMineRoute = env + "api/payment/mine"
 
 // --- UPLOAD ---
 var uploadImageRoute = env + "api/upload/image"

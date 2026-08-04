@@ -71,6 +71,7 @@ var DyTAuth = (function () {
     isAdmin: isAdmin,
     login: login,
     register: register,
+    setUser: setUser,
     logout: logout
   };
 })();

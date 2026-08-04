@@ -118,6 +118,20 @@ function showError(message) {
   var toast = document.getElementById('toastMessage');
   if (container && toast) {
     toast.textContent = message;
+    toast.classList.remove('toast-message--success');
+    container.classList.add('visible');
+    setTimeout(function () { container.classList.remove('visible'); }, 3000);
+  } else {
+    alert(message);
+  }
+}
+
+function showSuccess(message) {
+  var container = document.getElementById('toastContainer');
+  var toast = document.getElementById('toastMessage');
+  if (container && toast) {
+    toast.textContent = message;
+    toast.classList.add('toast-message--success');
     container.classList.add('visible');
     setTimeout(function () { container.classList.remove('visible'); }, 3000);
   } else {
@@ -350,6 +364,7 @@ var pageTitles={
   'register':'Crear cuenta',
   'verify':'Verificación de cuenta',
   'dashboard':'Dashboard',
+  'account':'Mi Cuenta',
   'tickets':'Mis Tickets',
   'ticket-new':'Nuevo Ticket',
   'ticket-detail':'Detalle de Ticket',
@@ -378,6 +393,7 @@ function handleRoute(){
     case 'register':showPage('register',false);setTitle('register');break
     case 'verify':showPage('verify',false);setTitle('verify');break
     case 'dashboard':showPage('dashboard',true);setTitle('dashboard');break
+    case 'account':showPage('account',true);setTitle('account');break
     case 'tickets':
       if(parts[1]==='new'){showPage('ticket-new',true);setTitle('ticket-new')}
       else if(parts[1]){showPage('ticket-detail',true);setTitle('ticket-detail')}

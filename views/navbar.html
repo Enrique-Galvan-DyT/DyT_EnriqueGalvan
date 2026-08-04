@@ -38,6 +38,9 @@
           <a href="#/dashboard" class="navbar-dropdown-item navbar-client-link">
             <i class="ph-light ph-squares-four"></i> Dashboard
           </a>
+          <a href="#/account" class="navbar-dropdown-item">
+            <i class="ph-light ph-user-circle"></i> Mi Cuenta
+          </a>
           <a href="#/tickets" class="navbar-dropdown-item navbar-client-link">
             <i class="ph-light ph-ticket"></i> Mis Tickets
           </a>
@@ -198,6 +201,8 @@
 
   document.addEventListener('auth:changed', updateNavAuth);
   window.addEventListener('hashchange', updateNavAuth);
+
+  window.updateNavAuth = updateNavAuth;
 
   updateNavAuth();
 })();

@@ -5,11 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Recurso | Desarrollo y Tecnología - Enrique Galván</title>
   <link rel="icon" type="image/png" href="public/media/images/logo g.png">
+
+  <!-- SEO -->
+  <meta name="description" content="Academia DyT_EG - Videos, guías, cursos y plantillas para dominar las herramientas del desarrollo profesional. Aprende a tu ritmo.">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="DyT_EG">
+  <meta property="og:title" content="DyT_EG | Academia - Aprende a tu ritmo">
+  <meta property="og:description" content="Videos, guías, cursos y plantillas para dominar las herramientas que usamos en el desarrollo profesional. Recursos DyT_EG, aprende a tu ritmo.">
+  <meta property="og:url" content="https://dyteg.bsite.net/resource.html">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:image" content="https://dyteg.bsite.net/public/media/images/Formato%20A%20v4.png">
+  <meta property="og:image:width" content="1005">
+  <meta property="og:image:height" content="245">
+  <meta property="og:image:alt" content="DyT_EG Academia - Recursos de desarrollo y tecnología">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DyT_EG | Academia - Aprende a tu ritmo">
+  <meta name="twitter:description" content="Videos, guías, cursos y plantillas para dominar las herramientas del desarrollo profesional. Recursos DyT_EG.">
+  <meta name="twitter:image" content="https://dyteg.bsite.net/public/media/images/Formato%20A%20v4.png">
+  <meta name="twitter:image:alt" content="DyT_EG Academia - Recursos de desarrollo y tecnología">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css">
+  <link rel="stylesheet" href="public/css/style.css">
   <link rel="stylesheet" href="public/css/resource.css">
 </head>
 <body>
@@ -72,6 +96,14 @@
         <!-- Body content (CKEditor + placeholder injection) -->
         <div id="bodySection" class="resource-detail-section" style="display:none;">
           <div id="bodyContainer" class="resource-body-container"></div>
+        </div>
+
+        <!-- Reviews section (valoraciones) -->
+        <div id="reviewsSection" class="resource-detail-section" style="display:none;">
+          <h2 class="resource-detail-section-title"><i class="ph-light ph-star"></i> Valoraciones</h2>
+          <div id="reviewsSummary" class="resource-reviews-summary"></div>
+          <div id="reviewsForm" class="resource-review-form" style="display:none;"></div>
+          <div id="reviewsList" class="resource-reviews-list"></div>
         </div>
       </div>
     </div>
@@ -138,6 +170,27 @@
     </div>
   </div>
 
+  <!-- Confirm / alert modal -->
+  <div class="pricing-modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="pricing-modal" style="max-width:420px;">
+      <div class="pricing-modal-header">
+        <div>
+          <h2 class="pricing-modal-title" id="confirmModalTitle">Confirmar</h2>
+          <p class="pricing-modal-subtitle" id="confirmModalMsg"></p>
+        </div>
+        <button class="pricing-modal-close" id="confirmModalClose" aria-label="Cerrar">
+          <i class="ph-light ph-x"></i>
+        </button>
+      </div>
+      <div class="pricing-modal-body">
+        <div class="confirm-modal-actions">
+          <button class="btn btn-secondary" id="confirmCancelBtn">Cancelar</button>
+          <button class="btn btn-primary" id="confirmOkBtn">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js"></script>
   <script src="https://cdn.conekta.io/js/latest/conekta.js"></script>
@@ -186,6 +239,297 @@
         return (json && json.data) || json || null;
       }).catch(function() {
         return null;
+      });
+    }
+
+    // ── Valoraciones ──────────────────────────────
+
+    // Estrellas de solo lectura (0-5, pasos 0.5)
+    function renderStars(el, rating) {
+      if (!el) return;
+      var value = parseFloat(rating) || 0;
+      var full = Math.floor(value);
+      var half = (value - full) >= 0.5 ? 1 : 0;
+      var empty = 5 - full - half;
+      var html = '';
+      for (var i = 0; i < full; i++) html += '<i class="ph-fill ph-star"></i>';
+      if (half) html += '<i class="ph-fill ph-star-half"></i>';
+      for (var i = 0; i < empty; i++) html += '<i class="ph-light ph-star"></i>';
+      el.innerHTML = html;
+    }
+
+    // Selector interactivo de estrellas (medias estrellas)
+    function renderStarSelector(el, onChange) {
+      if (!el) return;
+      var rating = 0;
+      var isHover = false;
+      var hoverValue = 0;
+
+      function label(value) {
+        if (value <= 0) return 'Sin valorar';
+        return (value % 1 === 0) ? value.toString() : value.toFixed(1);
+      }
+
+      function draw(value, asHover) {
+        if (value === undefined || value === null) value = rating;
+        el.innerHTML = '';
+        for (var s = 1; s <= 5; s++) {
+          var state;
+          if (value >= s) state = 'full';
+          else if (value >= s - 0.5) state = 'half';
+          else state = 'empty';
+
+          var icon;
+          if (state === 'full') icon = 'ph-fill ph-star';
+          else if (state === 'half') icon = 'ph-fill ph-star-half';
+          else icon = 'ph-light ph-star';
+
+          var star = document.createElement('span');
+          star.className = 'star-selector-star';
+          star.setAttribute('data-slot', s);
+          star.innerHTML = '<i class="' + icon + ' active"></i>';
+          star.title = label(state === 'half' ? s - 0.5 : s);
+
+          star.addEventListener('mousemove', (function(slot, that) {
+            return function(e) {
+              var rect = that.getBoundingClientRect();
+              var halfVal = slot - (e.clientX < rect.left + rect.width / 2 ? 0.5 : 0);
+              isHover = true;
+              hoverValue = halfVal;
+              draw(halfVal, true);
+            };
+          })(s, star));
+
+          star.addEventListener('mouseleave', function() {
+            isHover = false;
+            draw(rating);
+          });
+
+          star.addEventListener('click', (function(slot, that) {
+            return function(e) {
+              var rect = that.getBoundingClientRect();
+              rating = slot - (e.clientX < rect.left + rect.width / 2 ? 0.5 : 0);
+              isHover = false;
+              draw(rating);
+              if (typeof onChange === 'function') onChange(rating);
+            };
+          })(s, star));
+
+          el.appendChild(star);
+        }
+
+        var lbl = document.createElement('span');
+        lbl.className = 'star-selector-label';
+        lbl.textContent = (asHover ? label(hoverValue) : label(rating));
+        el.appendChild(lbl);
+      }
+
+      draw(rating);
+
+      el.getRating = function() { return rating; };
+      el.setRating = function(value) {
+        rating = Math.min(5, Math.max(0, value));
+        isHover = false;
+        draw(rating);
+      };
+    }
+
+    function formatReviewDate(iso) {
+      try {
+        return new Date(iso).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch (e) { return ''; }
+    }
+
+    // ── Modal de confirmacion / aviso ─────────────
+    var confirmModalEl = document.getElementById('confirmModal');
+    var confirmResolve = null;
+
+    function openConfirmModal(title, message, onConfirm, opts) {
+      document.getElementById('confirmModalTitle').textContent = title || 'Confirmar';
+      document.getElementById('confirmModalMsg').textContent = message || '';
+      var okBtn = document.getElementById('confirmOkBtn');
+      var cancelBtn = document.getElementById('confirmCancelBtn');
+      okBtn.textContent = (opts && opts.confirmText) || 'Confirmar';
+      cancelBtn.style.display = (opts && opts.hideCancel) ? 'none' : '';
+      confirmResolve = (typeof onConfirm === 'function') ? onConfirm : null;
+      confirmModalEl.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeConfirmModal() {
+      confirmModalEl.classList.remove('active');
+      document.body.style.overflow = '';
+      confirmResolve = null;
+    }
+
+    function showAlertModal(message, title) {
+      openConfirmModal(title || 'Aviso', message, null, { hideCancel: true, confirmText: 'Aceptar' });
+    }
+
+    var confirmOkBtn = document.getElementById('confirmOkBtn');
+    if (confirmOkBtn) {
+      confirmOkBtn.addEventListener('click', function() {
+        var cb = confirmResolve;
+        closeConfirmModal();
+        if (cb) cb();
+      });
+    }
+    var confirmCancelBtn = document.getElementById('confirmCancelBtn');
+    if (confirmCancelBtn) {
+      confirmCancelBtn.addEventListener('click', closeConfirmModal);
+    }
+    var confirmModalClose = document.getElementById('confirmModalClose');
+    if (confirmModalClose) {
+      confirmModalClose.addEventListener('click', closeConfirmModal);
+    }
+    if (confirmModalEl) {
+      confirmModalEl.addEventListener('click', function(e) {
+        if (e.target === confirmModalEl) closeConfirmModal();
+      });
+    }
+
+    function loadReviews(resourceId) {
+      var section = document.getElementById('reviewsSection');
+      if (!section) return;
+      var summaryEl = document.getElementById('reviewsSummary');
+      var formEl = document.getElementById('reviewsForm');
+      var listEl = document.getElementById('reviewsList');
+
+      var user = getLocalStorage('DyT_EG_user');
+      var token = user ? user.token : null;
+      var isAdmin = !!(user && user.role === 'admin');
+
+      fetch(env + 'api/academy/resources/' + resourceId + '/reviews', {
+        headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+      }).then(function(r) { return r.json(); }).then(function(json) {
+        if (!json || json.success !== true) return;
+        var data = json.data || {};
+        var reviews = data.reviews || [];
+        var avg = parseFloat(data.avgRating || 0);
+        var count = parseInt(data.count, 10) || reviews.length || 0;
+        var my = data.myReview || null;
+
+        // Resumen con promedio
+        var summaryHtml = '<div class="resource-review-average">';
+        if (count > 0) {
+          summaryHtml += '<span class="resource-review-avg-num">' + (Math.round(avg * 10) / 10).toFixed(1) + '</span>';
+          summaryHtml += '<div class="resource-review-summary-right">' +
+            '<div class="stars-display" id="reviewsAvgStars"></div>' +
+            '<span class="stars-display-value">' + count + (count === 1 ? ' valoracion' : ' valoraciones') + '</span>' +
+            '</div>';
+        } else {
+          summaryHtml += '<span class="resource-review-empty">Aun no hay valoraciones. Se el primero en dejar una.</span>';
+        }
+        summaryHtml += '</div>';
+        summaryEl.innerHTML = summaryHtml;
+        if (count > 0) renderStars(document.getElementById('reviewsAvgStars'), avg);
+
+        // Formulario solo para compradores activos o admin que aun no valoran
+        formEl.style.display = 'none';
+        formEl.innerHTML = '';
+        if (user && token) {
+          getPurchaseStatus(resourceId).then(function(st) {
+            var canReview = isAdmin || st.owned;
+            if (!canReview) return;
+            if (my) {
+              formEl.innerHTML = '<div class="resource-owned-badge"><i class="ph-light ph-check-circle"></i> Ya valoraste este recurso</div>';
+              formEl.style.display = '';
+              return;
+            }
+            renderReviewForm();
+          });
+        }
+
+        // Lista de valoraciones
+        if (reviews.length > 0) {
+          var listHtml = '';
+          reviews.forEach(function(r) {
+            listHtml += '<div class="resource-review-item">' +
+              '<div class="resource-review-head">' +
+                '<span class="resource-review-author">' + escapeHtml(r.clientName || r.User || 'Usuario') + '</span>' +
+                '<span class="resource-review-date">' + formatReviewDate(r.createdAt) + '</span>' +
+              '</div>' +
+              '<div class="stars-display" data-stars></div>' +
+              (r.comment ? '<p class="resource-review-comment">' + escapeHtml(r.comment) + '</p>' : '') +
+              (isAdmin ? '<button class="btn btn-sm btn-danger" data-del="' + r.id + '"><i class="ph-light ph-trash"></i> Eliminar</button>' : '') +
+            '</div>';
+          });
+          listEl.innerHTML = listHtml;
+          listEl.querySelectorAll('[data-stars]').forEach(function(el, i) {
+            renderStars(el, reviews[i].rating);
+          });
+          listEl.querySelectorAll('[data-del]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              var reviewId = btn.getAttribute('data-del');
+              openConfirmModal('Eliminar valoracion', '¿Seguro que deseas eliminar esta valoracion?', function() {
+                fetch(env + 'api/academy/resources/' + resourceId + '/reviews/' + reviewId, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': 'Bearer ' + token }
+                }).then(function(r) { return r.json(); }).then(function(res) {
+                  if (res && res.success === true) {
+                    loadReviews(resourceId);
+                  } else {
+                    showAlertModal((res && res.message) || 'No se pudo eliminar la valoracion.');
+                  }
+                });
+              }, { confirmText: 'Eliminar' });
+            });
+          });
+        } else {
+          listEl.innerHTML = '';
+        }
+
+        section.style.display = '';
+      }).catch(function() {
+        section.style.display = 'none';
+      });
+    }
+
+    function renderReviewForm() {
+      var formEl = document.getElementById('reviewsForm');
+      formEl.innerHTML =
+        '<div class="resource-review-form-inner">' +
+          '<h3 class="resource-review-form-title">Tu valoracion</h3>' +
+          '<p class="resource-review-form-note">Comparte tu experiencia con este recurso. Una vez enviada no podras modificarla.</p>' +
+          '<div class="star-selector" id="reviewStarSelector"></div>' +
+          '<label class="form-label" for="reviewComment">Comentario (opcional)</label>' +
+          '<textarea class="form-input" id="reviewComment" rows="3" maxlength="1000" placeholder="¿Que te parecio este recurso?"></textarea>' +
+          '<div class="resource-review-error" id="reviewError" style="display:none;"></div>' +
+          '<button class="btn btn-primary" id="reviewSubmitBtn"><i class="ph-light ph-paper-plane-tilt"></i> Enviar valoracion</button>' +
+        '</div>';
+      formEl.style.display = '';
+      renderStarSelector(document.getElementById('reviewStarSelector'));
+      document.getElementById('reviewSubmitBtn').addEventListener('click', function() {
+        var selector = document.getElementById('reviewStarSelector');
+        var rating = (typeof selector.getRating === 'function') ? selector.getRating() : 0;
+        var err = document.getElementById('reviewError');
+        if (rating <= 0) {
+          err.textContent = 'Selecciona una valoracion con estrellas';
+          err.style.display = 'block';
+          return;
+        }
+        openConfirmModal('Enviar valoracion', 'Una vez enviada tu valoracion quedara registrada y no podras modificarla despues. ¿Deseas continuar?', function() {
+          var user = getLocalStorage('DyT_EG_user');
+          var comment = document.getElementById('reviewComment').value;
+          fetch(env + 'api/academy/resources/' + resourceId + '/reviews', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + user.token
+            },
+            body: JSON.stringify({ rating: rating, comment: comment })
+          }).then(function(r) { return r.json(); }).then(function(json) {
+            if (json && json.success === true) {
+              loadReviews(resourceId);
+            } else {
+              err.textContent = (json && json.message) || 'No se pudo guardar tu valoracion.';
+              err.style.display = 'block';
+            }
+          }).catch(function() {
+            err.textContent = 'Error de conexion. Intenta de nuevo.';
+            err.style.display = 'block';
+          });
+        }, { confirmText: 'Enviar' });
       });
     }
 
@@ -841,6 +1185,7 @@
       } // renderContentSections
 
       showContent();
+      loadReviews(resourceId);
     });
 
     // Disable right-click on content area

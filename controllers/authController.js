@@ -136,3 +136,47 @@ async function authGetVerifyLink(id) {
         });
     });
 }
+
+// --- UPDATE PROFILE (name) ---
+async function authUpdateProfile(name) {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: authProfileRoute,
+            type: "PUT",
+            contentType: "application/json",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            data: JSON.stringify({ Name: name }),
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                showError("Error de conexion");
+                resolve({ success: false, message: "Error de conexion" });
+            }
+        });
+    });
+}
+
+// --- CHANGE PASSWORD ---
+async function authChangePassword(currentPassword, newPassword) {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: authPasswordRoute,
+            type: "PUT",
+            contentType: "application/json",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            data: JSON.stringify({ CurrentPassword: currentPassword, NewPassword: newPassword }),
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                showError("Error de conexion");
+                resolve({ success: false, message: "Error de conexion" });
+            }
+        });
+    });
+}

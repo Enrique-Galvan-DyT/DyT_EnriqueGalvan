@@ -225,7 +225,7 @@
 
         html += '<div class="pricing-item' + selectedClass + '" data-id="' + item.id + '">';
         html += '<div class="pricing-item-left">';
-        html += '<div class="pricing-item-check"><i class="ph-bold ph-check"></i></div>';
+        html += '<div class="pricing-item-check"><i class="ph-light ph-check"></i></div>';
         html += '<div class="pricing-item-info">';
         html += '<div class="pricing-item-name">' + item.name + '</div>';
         html += '<div class="pricing-item-desc">' + item.description + '</div>';
@@ -235,9 +235,9 @@
 
         if (item.qty) {
           html += '<div class="pricing-item-qty">';
-          html += '<button class="pricing-qty-btn" data-action="dec" data-id="' + item.id + '"><i class="ph-bold ph-minus"></i></button>';
+          html += '<button class="pricing-qty-btn" data-action="dec" data-id="' + item.id + '"><i class="ph-light ph-minus"></i></button>';
           html += '<span class="pricing-qty-value">' + qty + '</span>';
-          html += '<button class="pricing-qty-btn" data-action="inc" data-id="' + item.id + '"><i class="ph-bold ph-plus"></i></button>';
+          html += '<button class="pricing-qty-btn" data-action="inc" data-id="' + item.id + '"><i class="ph-light ph-plus"></i></button>';
           html += '</div>';
         }
 

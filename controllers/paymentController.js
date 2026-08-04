@@ -61,6 +61,25 @@ async function getPaymentStatus(resourceId) {
     });
 }
 
+// --- MINE: ids de recursos adquiridos por el usuario ---
+async function getMyPurchases() {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: paymentMineRoute,
+            type: "GET",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            success: function (response) {
+                resolve((response && response.success && response.data) ? response.data : []);
+            },
+            error: function () {
+                resolve([]);
+            }
+        });
+    });
+}
+
 // --- ADMIN: historial de compras (planes y recursos) ---
 async function getAdminPurchases() {
     var user = getLocalStorage('DyT_EG_user');

@@ -1,0 +1,215 @@
+<section class="dashboard-page">
+  <div class="container">
+    <div class="dashboard-header reveal">
+      <div>
+        <h1 class="dashboard-greeting">Mi Cuenta</h1>
+        <p class="dashboard-subtitle">Actualiza tu nombre y tu contraseña</p>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-section reveal">
+        <div class="dashboard-section-header">
+          <h3>Perfil</h3>
+        </div>
+        <form id="profileForm" class="auth-form" style="max-width:none;">
+          <div class="form-group">
+            <label class="form-label" for="accName">Nombre completo</label>
+            <div class="form-input-wrapper">
+              <i class="ph-light ph-user form-input-icon"></i>
+              <input type="text" id="accName" class="form-input" placeholder="Tu nombre" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="accEmail">Correo electrónico</label>
+            <div class="form-input-wrapper">
+              <i class="ph-light ph-envelope form-input-icon"></i>
+              <input type="email" id="accEmail" class="form-input" disabled>
+            </div>
+          </div>
+
+          <div id="profileError" class="auth-error" style="display:none"></div>
+
+          <button type="submit" class="btn btn-primary" id="profileBtn">
+            <span class="btn-text">Guardar cambios</span>
+            <span class="btn-loading" style="display:none">
+              <i class="ph-light ph-spinner"></i> Guardando...
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <div class="dashboard-section reveal reveal-delay-1">
+        <div class="dashboard-section-header">
+          <h3>Cambiar contraseña</h3>
+        </div>
+        <form id="passwordForm" class="auth-form" style="max-width:none;">
+          <div class="form-group">
+            <label class="form-label" for="accCurrentPwd">Contraseña actual</label>
+            <div class="form-input-wrapper">
+              <i class="ph-light ph-lock-key form-input-icon"></i>
+              <input type="password" id="accCurrentPwd" class="form-input" required>
+              <button type="button" class="password-toggle" onclick="togglePassword('accCurrentPwd', this)">
+                <i class="ph-light ph-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="accNewPwd">Nueva contraseña</label>
+            <div class="form-input-wrapper">
+              <i class="ph-light ph-lock-key form-input-icon"></i>
+              <input type="password" id="accNewPwd" class="form-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+              <button type="button" class="password-toggle" onclick="togglePassword('accNewPwd', this)">
+                <i class="ph-light ph-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="accConfirmPwd">Confirmar nueva contraseña</label>
+            <div class="form-input-wrapper">
+              <i class="ph-light ph-lock-key form-input-icon"></i>
+              <input type="password" id="accConfirmPwd" class="form-input" required minlength="8">
+              <button type="button" class="password-toggle" onclick="togglePassword('accConfirmPwd', this)">
+                <i class="ph-light ph-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="passwordError" class="auth-error" style="display:none"></div>
+
+          <button type="submit" class="btn btn-primary" id="passwordBtn">
+            <span class="btn-text">Actualizar contraseña</span>
+            <span class="btn-loading" style="display:none">
+              <i class="ph-light ph-spinner"></i> Actualizando...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var user = DyTAuth.getUser();
+  var nameInput = document.getElementById('accName');
+  var emailInput = document.getElementById('accEmail');
+
+  if (user) {
+    nameInput.value = user.name || '';
+    emailInput.value = user.email || '';
+  }
+
+  function setBusy(btn, busy) {
+    btn.querySelector('.btn-text').style.display = busy ? 'none' : 'inline';
+    btn.querySelector('.btn-loading').style.display = busy ? 'inline' : 'none';
+    btn.disabled = busy;
+  }
+
+  // --- Perfil (nombre) ---
+  var profileForm = document.getElementById('profileForm');
+  var profileBtn = document.getElementById('profileBtn');
+  var profileError = document.getElementById('profileError');
+
+  profileForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    profileError.style.display = 'none';
+    var name = nameInput.value.trim();
+
+    if (!name) {
+      profileError.textContent = 'El nombre es obligatorio';
+      profileError.style.display = 'block';
+      return;
+    }
+
+    setBusy(profileBtn, true);
+    authUpdateProfile(name).then(function(res) {
+      setBusy(profileBtn, false);
+      if (res && res.success) {
+        if (window.DyTAuth) {
+          var stored = DyTAuth.getUser() || {};
+          var updated = Object.assign({}, stored, {
+            name: res.user.name,
+            email: res.user.email,
+            role: res.user.role,
+            id: res.user.id
+          });
+          if (res.token) updated.token = res.token;
+          DyTAuth.setUser(updated);
+          document.dispatchEvent(new CustomEvent('auth:changed'));
+          if (typeof window.updateNavAuth === 'function') window.updateNavAuth();
+        }
+        showSuccess(res.message || 'Perfil actualizado correctamente');
+      } else {
+        profileError.textContent = (res && res.message) || 'Error al actualizar el perfil';
+        profileError.style.display = 'block';
+      }
+    });
+  });
+
+  // --- Contraseña ---
+  var passwordForm = document.getElementById('passwordForm');
+  var passwordBtn = document.getElementById('passwordBtn');
+  var passwordError = document.getElementById('passwordError');
+
+  passwordForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    passwordError.style.display = 'none';
+
+    var current = document.getElementById('accCurrentPwd').value;
+    var next = document.getElementById('accNewPwd').value;
+    var confirm = document.getElementById('accConfirmPwd').value;
+
+    if (!current || !next || !confirm) {
+      passwordError.textContent = 'Completa todos los campos';
+      passwordError.style.display = 'block';
+      return;
+    }
+
+    if (next.length < 8) {
+      passwordError.textContent = 'La nueva contraseña debe tener al menos 8 caracteres';
+      passwordError.style.display = 'block';
+      return;
+    }
+
+    if (next !== confirm) {
+      passwordError.textContent = 'Las contraseñas no coinciden';
+      passwordError.style.display = 'block';
+      return;
+    }
+
+    setBusy(passwordBtn, true);
+    authChangePassword(current, next).then(function(res) {
+      setBusy(passwordBtn, false);
+      if (res && res.success) {
+        if (res.token && window.DyTAuth) {
+          var stored = DyTAuth.getUser() || {};
+          DyTAuth.setUser(Object.assign({}, stored, { token: res.token }));
+          document.dispatchEvent(new CustomEvent('auth:changed'));
+          if (typeof window.updateNavAuth === 'function') window.updateNavAuth();
+        }
+        passwordForm.reset();
+        showSuccess(res.message || 'Contraseña actualizada correctamente');
+      } else {
+        passwordError.textContent = (res && res.message) || 'Error al actualizar la contraseña';
+        passwordError.style.display = 'block';
+      }
+    });
+  });
+
+  window.togglePassword = function(inputId, btn) {
+    var input = document.getElementById(inputId);
+    var icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'ph-light ph-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'ph-light ph-eye';
+    }
+  };
+})();
+</script>

@@ -33,9 +33,11 @@ var academiaUI = (function () {
     'Descarga': 'ph-download'
   };
 
-  function render(data) {
+  function render(data, owned) {
     var grid = document.getElementById('academiaGrid');
     if (!grid || !data || !data.length) return;
+
+    owned = owned || {};
 
     var grouped = {};
     data.forEach(function (item) {
@@ -74,6 +76,8 @@ var academiaUI = (function () {
         var available = item.isAvailable !== undefined ? item.isAvailable : (item.IsAvailable !== undefined ? item.IsAvailable : true);
         var content = item.content || [];
         var lessons = item.lessons || [];
+        var avgRating = parseFloat(item.avgRating || item.avg_rating || 0) || 0;
+        var reviewCount = parseInt(item.reviewCount || item.review_count || 0, 10) || 0;
 
         var availableClass = available ? '' : ' academia-item--unavailable';
         var badgeClass = 'academia-badge--' + (levelBadgeClass[level.toLowerCase()] || 'all');
@@ -100,6 +104,13 @@ var academiaUI = (function () {
         html += '<a href="' + detailUrl + '" class="academia-item-title"><h4>' + title + '</h4></a>';
         html += '<p class="academia-item-desc">' + desc + '</p>';
 
+        if (reviewCount > 0) {
+          html += '<div class="academia-item-rating">';
+          html += '<span class="stars-display" data-stars-avg="' + avgRating + '"></span>';
+          html += '<span class="stars-display-value">' + reviewCount + (reviewCount === 1 ? ' valoracion' : ' valoraciones') + '</span>';
+          html += '</div>';
+        }
+
         if (lessons.length > 0) {
           html += '<div class="academia-item-lessons">';
           html += '<span class="academia-lessons-count"><i class="ph-light ph-list"></i> ' + lessons.length + ' lecciones</span>';
@@ -115,7 +126,13 @@ var academiaUI = (function () {
         html += '<span class="academia-price">$' + price.toLocaleString('es-MX') + '</span>';
 
         if (available) {
-          html += '<a class="btn btn-sm btn-primary" href="' + detailUrl + '">Obtener</a>';
+          var isPaid = price > 0;
+          var isOwned = isPaid && owned[String(itemId)];
+          if (isOwned) {
+            html += '<a class="btn btn-sm btn-secondary" href="' + detailUrl + '"><i class="ph-light ph-check-circle"></i> Adquirido</a>';
+          } else {
+            html += '<a class="btn btn-sm btn-primary" href="' + detailUrl + '">Obtener</a>';
+          }
         } else {
           html += '<button class="btn btn-sm btn-secondary" disabled>No disponible</button>';
         }
@@ -130,6 +147,11 @@ var academiaUI = (function () {
     });
 
     grid.innerHTML = html;
+    grid.querySelectorAll('[data-stars-avg]').forEach(function (el) {
+      if (typeof renderStars === 'function') {
+        renderStars(el, parseFloat(el.getAttribute('data-stars-avg')) || 0);
+      }
+    });
   }
 
   return { render: render };
@@ -143,7 +165,16 @@ function fetchAcademiaResources() {
     var g = document.getElementById('academiaGrid');
     if (!g) return;
     if (data && data.length) {
-      academiaUI.render(data);
+      var user = getLocalStorage('DyT_EG_user');
+      if (user && user.token) {
+        getMyPurchases().then(function (ids) {
+          var owned = {};
+          (ids || []).forEach(function (id) { owned[String(id)] = true; });
+          academiaUI.render(data, owned);
+        });
+      } else {
+        academiaUI.render(data, {});
+      }
     } else {
       g.innerHTML = '<div style="text-align:center;padding:3rem 0;color:var(--text-muted);"><p>No hay recursos disponibles aun.</p></div>';
     }
