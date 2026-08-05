@@ -147,3 +147,65 @@ async function deleteAcademyResource(id) {
         });
     });
 }
+
+// --- GET RESOURCE REVIEWS ---
+async function getAcademyResourceReviews(resourceId) {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: buildUrl(getAcademyResourceReviewsRoute, { id: resourceId }),
+            type: "GET",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                showError("Error de conexion con el servidor");
+                resolve({ success: false });
+            }
+        });
+    });
+}
+
+// --- SUBMIT RESOURCE REVIEW ---
+async function submitAcademyResourceReview(resourceId, payload) {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: buildUrl(addAcademyResourceReviewRoute, { id: resourceId }),
+            type: "POST",
+            contentType: "application/json",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            data: JSON.stringify(payload),
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                showError("Error al enviar la valoracion");
+                resolve({ success: false, message: "Error de conexion con el servidor" });
+            }
+        });
+    });
+}
+
+// --- DELETE RESOURCE REVIEW (admin) ---
+async function deleteAcademyResourceReview(resourceId, reviewId) {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: buildUrl(deleteAcademyResourceReviewRoute, { id: resourceId, reviewId: reviewId }),
+            type: "DELETE",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                showError("Error al eliminar la valoracion");
+                resolve({ success: false, message: "Error de conexion con el servidor" });
+            }
+        });
+    });
+}

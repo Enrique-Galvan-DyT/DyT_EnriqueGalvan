@@ -37,6 +37,11 @@ var addResourceLessonRoute = env + "api/academy/resources/[id]/lessons"
 var updateLessonRoute = env + "api/academy/lessons/[id]"
 var deleteLessonRoute = env + "api/academy/lessons/[id]"
 
+// --- ACADEMY REVIEWS ---
+var getAcademyResourceReviewsRoute = env + "api/academy/resources/[id]/reviews"
+var addAcademyResourceReviewRoute = env + "api/academy/resources/[id]/reviews"
+var deleteAcademyResourceReviewRoute = env + "api/academy/resources/[id]/reviews/[reviewId]"
+
 // --- PAYMENTS (Conekta) ---
 var paymentConfigRoute = env + "api/payment/config"
 var paymentCheckoutRoute = env + "api/payment/checkout"

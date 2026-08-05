@@ -73,6 +73,7 @@ var resourcesAllowed=[
             '<script src="controllers/routes.js"></script>',
             '<script src="controllers/academyController.js"></script>',
             '<script src="controllers/paymentController.js"></script>',
+            '<script src="controllers/resourceController.js"></script>',
             '<script src="controllers/academyContentController.js"></script>',
             '<script src="controllers/uploadController.js"></script>',
             '<script src="controllers/authController.js"></script>',
