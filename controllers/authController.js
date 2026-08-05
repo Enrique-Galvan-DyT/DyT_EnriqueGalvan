@@ -180,3 +180,23 @@ async function authChangePassword(currentPassword, newPassword) {
         });
     });
 }
+
+// --- DELETE ACCOUNT ---
+async function authDeleteAccount() {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: authDeleteAccountRoute,
+            type: "DELETE",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                showError("Error de conexion");
+                resolve({ success: false, message: "Error de conexion" });
+            }
+        });
+    });
+}

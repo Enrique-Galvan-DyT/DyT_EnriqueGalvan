@@ -440,7 +440,7 @@
     getClients().then(function(clients) {
       var sel = document.getElementById('formIdUser');
       sel.innerHTML = '<option value="">Ninguno</option>';
-      (clients || []).forEach(function(c) {
+      (clients || []).filter(function(c) { return c.role !== 'Deleted'; }).forEach(function(c) {
         var opt = document.createElement('option');
         opt.value = c.id;
         opt.textContent = c.name + ' (' + c.email + ')';

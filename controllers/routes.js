@@ -13,6 +13,7 @@ var authVerifyLinkRoute = env + "api/auth/verify-link/[id]"
 var authActivateRoute = env + "api/auth/activate/[id]"
 var authProfileRoute = env + "api/auth/profile"
 var authPasswordRoute = env + "api/auth/password"
+var authDeleteAccountRoute = env + "api/auth/account"
 
 // --- ACADEMY ---
 var getAcademyResourcesRoute = env + "api/academy/resources"

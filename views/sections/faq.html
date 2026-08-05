@@ -1,0 +1,110 @@
+<!-- FAQ Section - Dark Luxury -->
+<section id="faq" style="padding: var(--section-padding) 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <span class="eyebrow reveal">
+        <i class="ph-light ph-question"></i>
+        FAQ
+      </span>
+      <h2 class="reveal reveal-delay-1" style="margin-bottom: 1rem;">Preguntas frecuentes</h2>
+      <p class="reveal reveal-delay-2" style="margin: 0 auto; max-width: 520px;">
+        Resolvemos las dudas más comunes antes de empezar. ¿Tienes otra pregunta? Escríbenos.
+      </p>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item reveal reveal-delay-1">
+        <button type="button" class="faq-toggle" aria-expanded="false">
+          <span class="faq-question">¿Cuánto tarda mi proyecto?</span>
+          <i class="ph-light ph-caret-down faq-icon"></i>
+        </button>
+        <div class="faq-answer" hidden>
+          <p>Depende del alcance: una landing page suele tomar de 1 a 2 semanas, mientras que una web app o e-commerce toma de 3 a 8 semanas. Al iniciar te entregamos un cronograma con entregas parciales para que veas el avance en todo momento.</p>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-1">
+        <button type="button" class="faq-toggle" aria-expanded="false">
+          <span class="faq-question">¿Cómo funciona el proceso de trabajo?</span>
+          <i class="ph-light ph-caret-down faq-icon"></i>
+        </button>
+        <div class="faq-answer" hidden>
+          <p>Trabajamos en 4 pasos: descubrimiento y cotización, diseño, desarrollo y lanzamiento. Puedes ver el detalle de cada etapa en la sección <a href="#proceso" style="color: var(--accent-primary);">Nuestro Proceso</a>.</p>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-1">
+        <button type="button" class="faq-toggle" aria-expanded="false">
+          <span class="faq-question">¿Qué pasa si no estoy satisfecho con el resultado?</span>
+          <i class="ph-light ph-caret-down faq-icon"></i>
+        </button>
+        <div class="faq-answer" hidden>
+          <p>Trabajamos contigo hasta que el resultado cumpla lo acordado en la cotización. Antes de cada entrega confirmamos que todo cumpla con lo pactado; tu satisfacción es nuestra prioridad.</p>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-1">
+        <button type="button" class="faq-toggle" aria-expanded="false">
+          <span class="faq-question">¿Cómo se realizan los pagos?</span>
+          <i class="ph-light ph-caret-down faq-icon"></i>
+        </button>
+        <div class="faq-answer" hidden>
+          <p>Todos los precios se expresan en pesos mexicanos (MXN). Los pagos en línea se procesan de forma segura con Conekta, aceptando tarjetas Visa, Mastercard, American Express y otras. Los datos de tu tarjeta nunca llegan a nuestros servidores.</p>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-1">
+        <button type="button" class="faq-toggle" aria-expanded="false">
+          <span class="faq-question">¿El dominio y el hosting están incluidos?</span>
+          <i class="ph-light ph-caret-down faq-icon"></i>
+        </button>
+        <div class="faq-answer" hidden>
+          <p>Sí. Los planes incluyen 1 dominio con terminación .com, .com.mx, .net u .org mientras su costo anual no supere $600.00 MXN, además de hosting profesional con certificado SSL. Otras terminaciones se cotizan por separado.</p>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-1">
+        <button type="button" class="faq-toggle" aria-expanded="false">
+          <span class="faq-question">¿Incluye el código fuente de mi proyecto?</span>
+          <i class="ph-light ph-caret-down faq-icon"></i>
+        </button>
+        <div class="faq-answer" hidden>
+          <p>La compra de un servicio de desarrollo cubre el desarrollo del software, no la transferencia del código fuente. Si deseas adquirir el código fuente de tu proyecto, se cotiza por separado.</p>
+        </div>
+      </div>
+
+      <div class="faq-item reveal reveal-delay-1">
+        <button type="button" class="faq-toggle" aria-expanded="false">
+          <span class="faq-question">¿Qué incluye el soporte?</span>
+          <i class="ph-light ph-caret-down faq-icon"></i>
+        </button>
+        <div class="faq-answer" hidden>
+          <p>Respuesta en menos de 24 horas por tickets, seguimiento de tu proyecto desde tu panel y apoyo en la administración de tu sitio. Si necesitas atención más inmediata, existen planes de soporte prioritario.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  var items = document.querySelectorAll('.faq-item');
+  items.forEach(function(item) {
+    var toggle = item.querySelector('.faq-toggle');
+    var answer = item.querySelector('.faq-answer');
+    if (!toggle || !answer) return;
+    toggle.addEventListener('click', function() {
+      var isOpen = item.classList.contains('open');
+      items.forEach(function(other) {
+        other.classList.remove('open');
+        var t = other.querySelector('.faq-toggle');
+        if (t) t.setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+})();
+</script>

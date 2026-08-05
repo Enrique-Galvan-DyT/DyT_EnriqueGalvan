@@ -350,7 +350,7 @@ document.addEventListener('auralis:section-loaded', function(){
    Router — Hash-based page navigation
    ============================================ */
 
-var landingSections=['hero','services','portfolio','about','testimonials','pricing','academia','contact']
+var landingSections=['hero','services','portfolio','about','testimonials','proceso','pricing','faq','academia','contact']
 var currentPage=null
 
 function initRouter(){

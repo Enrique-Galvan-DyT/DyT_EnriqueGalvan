@@ -96,9 +96,16 @@ var academiaUI = (function () {
 
         html += '<div class="academia-item' + availableClass + '">';
 
+        html += '<a href="' + detailUrl + '" class="academia-item-image">';
         if (thumbnail) {
-          html += '<a href="' + detailUrl + '" class="academia-item-image"><img src="' + thumbnail + '" alt="' + escapeHtml(title) + '" loading="lazy"></a>';
+          html += '<img src="' + thumbnail + '" alt="' + escapeHtml(title) + '" loading="lazy">';
+        } else {
+          html += '<picture>' +
+            '<source media="(max-width: 768px)" srcset="public/media/images/Empty512x256.png">' +
+            '<img src="public/media/images/Empty256x256.png" alt="' + escapeHtml(title) + '" loading="lazy">' +
+            '</picture>';
         }
+        html += '</a>';
 
         html += '<div class="academia-item-info">';
         html += '<a href="' + detailUrl + '" class="academia-item-title"><h4>' + title + '</h4></a>';

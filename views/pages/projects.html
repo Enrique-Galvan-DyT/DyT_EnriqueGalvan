@@ -62,9 +62,7 @@
     var statusLabels = { planning: 'Planeacion', in_progress: 'En Progreso', completed: 'Completado', maintenance: 'Mantenimiento', archived: 'Archivado' };
 
     grid.innerHTML = filtered.map(function(p) {
-      var imgHtml = p.imageUrl
-        ? '<img class="portfolio-item-image" src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '">'
-        : '<div class="portfolio-item-placeholder"><i class="ph-light ph-briefcase"></i></div>';
+      var imgHtml = '<img class="portfolio-item-image" src="' + (p.imageUrl || 'public/media/images/Empty512x256.png') + '" alt="' + escapeHtml(p.name) + '" loading="lazy">';
 
       var t = testimonialByProject[p.id];
       var testimonialHtml = '';
