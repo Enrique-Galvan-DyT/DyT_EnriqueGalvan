@@ -383,7 +383,11 @@
     return Number(n || 0).toLocaleString('es-MX', { maximumFractionDigits: 2 });
   }
 
-  function monthlyAmount(price) {
+  function monthlyAmount(price, level) {
+    if (normalizeLevel(level) === 'premium') {
+      if (Number(price) > 20000) return price * 0.35;
+      return price * 0.40;
+    }
     return price * 0.65;
   }
 
@@ -397,7 +401,7 @@
     document.getElementById('checkoutTier').textContent = plan.level;
     document.getElementById('checkoutTitle').textContent = plan.title;
     document.getElementById('checkoutPrice').textContent = '$' + formatMoney(plan.price);
-    document.getElementById('checkoutMonthly').textContent = '$' + formatMoney(monthlyAmount(plan.price)) + ' MXN/mes';
+    document.getElementById('checkoutMonthly').textContent = '$' + formatMoney(monthlyAmount(plan.price, plan.level)) + ' MXN/mes';
     var desc = document.getElementById('checkoutDescription');
     if (desc) desc.textContent = plan.description;
 
@@ -589,7 +593,7 @@
               '<span class="pricing-period">MXN</span>' +
             '</div>' +
             '<div class="pricing-monthly">' +
-              '<span class="pricing-monthly-amount">$' + formatMoney(monthlyAmount(plan.price)) + '</span> MXN/mes' +
+              '<span class="pricing-monthly-amount">$' + formatMoney(monthlyAmount(plan.price, level)) + '</span> MXN/mes' +
             '</div>' +
             '<p style="font-size:0.8125rem;color:var(--text-muted);margin:0;">' + escapeHtml(plan.title) + '</p>' +
           '</div>' +

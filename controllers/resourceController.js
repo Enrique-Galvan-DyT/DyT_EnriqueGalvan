@@ -405,7 +405,6 @@
         if (!isLoggedIn()) {
             actions += '<a href="index.html#/login" class="btn btn-secondary">Iniciar sesion</a>';
         }
-        actions += '<a href="index.html#/contacto" class="btn btn-primary">Contactar</a>';
         return '<div class="video-locked">' +
             '<i class="ph-light ph-lock-key"></i>' +
             '<strong>' + escapeHtml(title) + '</strong>' +
@@ -812,7 +811,6 @@
                 if (!isLoggedIn()) {
                     actions.innerHTML += '<a href="index.html#/login" class="btn btn-secondary">Iniciar sesion</a>';
                 }
-                actions.innerHTML += '<a href="index.html#/contacto" class="btn btn-primary">Contactar</a>';
             }
 
             showContent();
