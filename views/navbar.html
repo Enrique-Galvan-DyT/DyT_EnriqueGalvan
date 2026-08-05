@@ -3,7 +3,7 @@
   <div class="navbar-inner">
     <!-- Logo -->
     <a href="#" class="navbar-logo">
-      <img src="public/media/images/Formato A v4.png" alt="DyT_EG" class="navbar-logo-img">
+      <img src="public/media/images/Formato A v4.png" alt="DyT_EG" class="navbar-logo-img" id="navLogo">
     </a>
 
     <!-- Desktop Nav Links -->
@@ -71,14 +71,19 @@
 
 <!-- Mobile Menu -->
 <div class="navbar-mobile-menu" id="navMobile">
+  <button class="navbar-mobile-close" id="navMobileClose" aria-label="Cerrar menú">
+    <i class="ph-light ph-x"></i>
+  </button>
   <div class="navbar-mobile-inner">
-    <a href="#/servicios" class="navbar-mobile-link">Servicios</a>
-    <a href="#/portafolio" class="navbar-mobile-link">Portafolio</a>
-    <a href="#/nosotros" class="navbar-mobile-link">Nosotros</a>
-    <a href="#/testimonios" class="navbar-mobile-link">Testimonios</a>
-    <a href="#/precios" class="navbar-mobile-link">Precios</a>
-    <a href="#/academia" class="navbar-mobile-link">Academia</a>
-    <a href="#/contacto" class="navbar-mobile-link">Contacto</a>
+    <div class="navbar-mobile-links">
+      <a href="#/servicios" class="navbar-mobile-link">Servicios</a>
+      <a href="#/portafolio" class="navbar-mobile-link">Portafolio</a>
+      <a href="#/nosotros" class="navbar-mobile-link">Nosotros</a>
+      <a href="#/testimonios" class="navbar-mobile-link">Testimonios</a>
+      <a href="#/precios" class="navbar-mobile-link">Precios</a>
+      <a href="#/academia" class="navbar-mobile-link">Academia</a>
+      <a href="#/contacto" class="navbar-mobile-link">Contacto</a>
+    </div>
     <div class="navbar-mobile-divider"></div>
     <div class="navbar-mobile-auth" id="navMobileAuth">
       <a href="#/login" class="btn btn-secondary" style="width: 100%; justify-content: center;">
@@ -108,22 +113,37 @@
   var mobileLinks = document.querySelectorAll('.navbar-mobile-link, .navbar-mobile-menu .btn');
 
   if (hamburger && mobile) {
+    function setMobileMenu(forceOpen) {
+      var open = (typeof forceOpen === 'boolean') ? forceOpen : !mobile.classList.contains('active');
+      mobile.classList.toggle('active', open);
+      hamburger.classList.toggle('active', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
     hamburger.addEventListener('click', function() {
-      hamburger.classList.toggle('active');
-      mobile.classList.toggle('active');
-      document.body.style.overflow = mobile.classList.contains('active') ? 'hidden' : '';
+      setMobileMenu();
+    });
+
+    var mobileClose = document.getElementById('navMobileClose');
+    if (mobileClose) {
+      mobileClose.addEventListener('click', function() {
+        setMobileMenu(false);
+      });
+    }
+
+    mobile.addEventListener('click', function(e) {
+      if (e.target === mobile) setMobileMenu(false);
     });
 
     mobileLinks.forEach(function(link) {
       link.addEventListener('click', function() {
-        hamburger.classList.remove('active');
-        mobile.classList.remove('active');
-        document.body.style.overflow = '';
+        setMobileMenu(false);
       });
     });
   }
 
   var loginBtn = document.getElementById('navLoginBtn');
+  var navLogo = document.getElementById('navLogo');
   var userMenu = document.getElementById('navUserMenu');
   var userBtn = document.getElementById('navUserBtn');
   var userDropdown = document.getElementById('navDropdown');
@@ -162,11 +182,13 @@
 
       if (mobileAuth) mobileAuth.style.display = 'none';
       if (mobileUser) mobileUser.style.display = 'block';
+      if (navLogo) navLogo.src = 'public/media/images/logo g.png';
     } else {
       loginBtn.style.display = 'flex';
       userMenu.style.display = 'none';
       if (mobileAuth) mobileAuth.style.display = 'block';
       if (mobileUser) mobileUser.style.display = 'none';
+      if (navLogo) navLogo.src = 'public/media/images/Formato A v4.png';
     }
   }
 

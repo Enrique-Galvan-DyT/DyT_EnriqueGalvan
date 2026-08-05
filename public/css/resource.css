@@ -236,16 +236,55 @@
   visibility: visible;
 }
 
+.navbar-mobile-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.navbar-mobile-close:hover {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
 .navbar-mobile-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   width: 100%;
   max-width: 320px;
+  height: 100vh;
+  height: 100dvh;
   padding: 2rem;
+  overflow: hidden;
   transform: translateY(16px);
   transition: transform 400ms var(--ease-out-expo);
+}
+
+.navbar-mobile-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .navbar-mobile-menu.active .navbar-mobile-inner {
