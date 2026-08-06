@@ -101,7 +101,7 @@ var academiaUI = (function () {
           html += '<img src="' + thumbnail + '" alt="' + escapeHtml(title) + '" loading="lazy">';
         } else {
           html += '<picture>' +
-            '<source media="(max-width: 768px)" srcset="public/media/images/Empty512x256.png">' +
+            '<source media="(max-width: 768px)" srcset="public/media/images/Empty512x128.png">' +
             '<img src="public/media/images/Empty256x256.png" alt="' + escapeHtml(title) + '" loading="lazy">' +
             '</picture>';
         }

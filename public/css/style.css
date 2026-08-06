@@ -1799,7 +1799,7 @@ body.page-active #footer-container { display: none; }
 
 .academia-item-image img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   display: block;
 }
