@@ -772,6 +772,30 @@
             document.getElementById('resourceTitle').textContent = title;
             document.getElementById('resourceDesc').textContent = desc;
 
+            // Filter out thumbnail from content
+            var files = [];
+            var thumbnail = null;
+            content.forEach(function (c) {
+                var ft = (c.fileType || c.FileType || '');
+                var fn = (c.fileName || c.FileName || '');
+                if (ft === 'image/thumbnail' || fn.indexOf('_thumbnail_') !== -1) {
+                    if (!thumbnail) thumbnail = c.fileUrl || c.FileUrl || null;
+                    return;
+                }
+                files.push(c);
+            });
+
+            var thumbEl = document.getElementById('resourceThumb');
+            if (thumbEl) {
+                if (thumbnail) {
+                    thumbEl.src = thumbnail;
+                    thumbEl.alt = title;
+                    thumbEl.style.display = 'block';
+                } else {
+                    thumbEl.style.display = 'none';
+                }
+            }
+
             renderPurchaseArea(price, isPaid, resource);
 
             var badge = document.getElementById('resourceBadge');
@@ -779,13 +803,6 @@
             badge.className = 'academia-badge';
 
             document.getElementById('resourceDuration').innerHTML = '<i class="ph-light ph-clock"></i> ' + duration;
-
-            // Filter out thumbnail from content
-            var files = content.filter(function (c) {
-                var ft = (c.fileType || c.FileType || '');
-                var fn = (c.fileName || c.FileName || '');
-                return ft !== 'image/thumbnail' && fn !== '_thumbnail_';
-            });
 
             // Recursos pagados: el contenido solo se muestra a compradores
             getPaymentStatus(resourceId).then(function (st) {

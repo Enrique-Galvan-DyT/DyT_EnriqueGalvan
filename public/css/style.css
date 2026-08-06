@@ -3298,6 +3298,24 @@ body.page-active #footer-container { display: none; }
     line-height: 1.6;
     max-width: 700px;
   }
+  .resource-detail-heading {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .resource-detail-thumb {
+    width: 300px;
+    max-width: 40%;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+    background: var(--bg-tertiary);
+  }
+  .resource-detail-heading-info {
+    flex: 1;
+    min-width: 0;
+  }
   .resource-detail-section {
     margin-bottom: 2.5rem;
   }
@@ -3494,6 +3512,14 @@ body.page-active #footer-container { display: none; }
     .resource-detail-title {
       font-size: 1.5rem;
     }
+    .resource-detail-heading {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .resource-detail-thumb {
+      width: 100%;
+      max-width: 100%;
+    }
   }
 
 /* ===== views\pages\projects.html ===== */
@@ -3660,6 +3686,24 @@ body.page-active #footer-container { display: none; }
     color: var(--text-secondary);
     line-height: 1.6;
     max-width: 700px;
+  }
+  .resource-detail-heading {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .resource-detail-thumb {
+    width: 300px;
+    max-width: 40%;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+    background: var(--bg-tertiary);
+  }
+  .resource-detail-heading-info {
+    flex: 1;
+    min-width: 0;
   }
   .resource-detail-section {
     margin-bottom: 2.5rem;
@@ -3984,6 +4028,14 @@ body.page-active #footer-container { display: none; }
   @media (max-width: 768px) {
     .resource-detail-title {
       font-size: 1.5rem;
+    }
+    .resource-detail-heading {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .resource-detail-thumb {
+      width: 100%;
+      max-width: 100%;
     }
     .resource-lesson-item {
       padding: 0.75rem;
