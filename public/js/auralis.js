@@ -307,8 +307,9 @@ function initSmoothScroll(){
     var link=e.target.closest('a[href^="#"]')
     if(!link)return
     var targetId=link.getAttribute('href')
-    if(targetId==='#')return
-    var target=document.querySelector(targetId)
+    if(targetId==='#'||targetId.indexOf('#/')===0)return
+    var target=null
+    try{target=document.querySelector(targetId)}catch(err){return}
     if(!target)return
     e.preventDefault()
     target.scrollIntoView({behavior:'smooth',block:'start'})
@@ -414,36 +415,25 @@ function handleRoute(){
         window.location.href = 'resource.html?id=' + encodeURIComponent(parts[1])
         return
       }
-      else{
-        if(currentPage!==null){showLanding()}
-        setTitle('');scrollToSection('academia')
-      }
-      break
+      goToLandingSection('academia');break
     case 'projects':
       if(parts[1]){showPage('project-detail',false);setTitle('proyecto')}
       else{showPage('projects',false);setTitle('proyectos')}
       break
     case 'inicio':
-      if(currentPage!==null){showLanding()}
-      setTitle('');scrollToSection('hero');break
+      goToLandingSection('hero');break
     case 'servicios':
-      if(currentPage!==null){showLanding()}
-      setTitle('');scrollToSection('services');break
+      goToLandingSection('services');break
     case 'nosotros':
-      if(currentPage!==null){showLanding()}
-      setTitle('');scrollToSection('about');break
+      goToLandingSection('about');break
     case 'precios':
-      if(currentPage!==null){showLanding()}
-      setTitle('');scrollToSection('pricing');break
+      goToLandingSection('pricing');break
     case 'portafolio':
-      if(currentPage!==null){showLanding()}
-      setTitle('');scrollToSection('portfolio');break
+      goToLandingSection('portfolio');break
     case 'testimonios':
-      if(currentPage!==null){showLanding()}
-      setTitle('');scrollToSection('testimonials');break
+      goToLandingSection('testimonials');break
     case 'contacto':
-      if(currentPage!==null){showLanding()}
-      setTitle('');scrollToSection('contact');break
+      goToLandingSection('contact');break
     default:showLanding();setTitle('');break
   }
 }
@@ -452,7 +442,7 @@ function showLanding(){
   currentPage=null
   document.body.classList.remove('page-active')
   var main=document.querySelector('main')
-  if(!main)return
+  if(!main)return Promise.resolve()
   main.innerHTML=''
   landingSections.forEach(function(name){
     var div=document.createElement('div')
@@ -460,7 +450,16 @@ function showLanding(){
     div.className='section'
     main.appendChild(div)
   })
-  loadSections().then(function(){initScrollReveal()})
+  return loadSections().then(function(){initScrollReveal()})
+}
+
+function goToLandingSection(id){
+  var done=function(){setTitle('');scrollToSection(id)}
+  if(currentPage!==null){
+    showLanding().then(done)
+  } else {
+    done()
+  }
 }
 
 function showPage(view,needsAuth,needsAdmin){
