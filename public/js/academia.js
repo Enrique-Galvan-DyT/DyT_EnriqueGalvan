@@ -130,15 +130,17 @@ var academiaUI = (function () {
         html += '</div>';
         html += '</div>';
         html += '<div class="academia-item-right">';
-        html += '<span class="academia-price">$' + price.toLocaleString('es-MX') + '</span>';
+        html += '<span class="academia-price">' + (price > 0 ? '$' + price.toLocaleString('es-MX') : 'Gratis') + '</span>';
 
         if (available) {
           var isPaid = price > 0;
           var isOwned = isPaid && owned[String(itemId)];
           if (isOwned) {
             html += '<a class="btn btn-sm btn-secondary" href="' + detailUrl + '"><i class="ph-light ph-check-circle"></i> Adquirido</a>';
-          } else {
+          } else if (isPaid) {
             html += '<a class="btn btn-sm btn-primary" href="' + detailUrl + '">Obtener</a>';
+          } else {
+            html += '<a class="btn btn-sm btn-primary" href="' + detailUrl + '"><i class="ph-light ph-download"></i> Abrir</a>';
           }
         } else {
           html += '<button class="btn btn-sm btn-secondary" disabled>No disponible</button>';

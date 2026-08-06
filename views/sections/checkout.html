@@ -1,0 +1,78 @@
+<!-- Checkout Modal (Conekta) - inyectado por auralis tras cargar style.css -->
+<div class="pricing-modal-overlay" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+  <div class="pricing-modal checkout-modal">
+    <div class="pricing-modal-header">
+      <div>
+        <h2 class="pricing-modal-title" id="checkoutTitle">Pagar con tarjeta</h2>
+        <p class="pricing-modal-subtitle" id="checkoutSubtitle"></p>
+      </div>
+      <button class="pricing-modal-close" id="closeCheckoutBtn" aria-label="Cerrar">
+        <i class="ph-light ph-x"></i>
+      </button>
+    </div>
+    <div class="pricing-modal-body">
+      <div class="checkout-summary">
+        <div class="checkout-row">
+          <span id="checkoutItemName"></span>
+          <span class="checkout-price" id="checkoutPrice"></span>
+        </div>
+      </div>
+      <form id="cardForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="checkoutName">Nombre en la tarjeta</label>
+          <input class="form-input" id="checkoutName" type="text" data-conekta="card[name]" autocomplete="cc-name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="checkoutEmail">Email de contacto</label>
+          <input class="form-input" id="checkoutEmail" type="email" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="checkoutCardNumber">Número de tarjeta</label>
+          <input class="form-input" id="checkoutCardNumber" type="text" inputmode="numeric" data-conekta="card[number]" autocomplete="cc-number" placeholder="4242 4242 4242 4242" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="checkoutCardCvc">CVC</label>
+            <input class="form-input" id="checkoutCardCvc" type="text" inputmode="numeric" data-conekta="card[cvc]" autocomplete="cc-csc" placeholder="123" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="checkoutCardMonth">Mes</label>
+            <input class="form-input" id="checkoutCardMonth" type="text" inputmode="numeric" data-conekta="card[exp_month]" autocomplete="cc-exp-month" placeholder="MM" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="checkoutCardYear">Año</label>
+            <input class="form-input" id="checkoutCardYear" type="text" inputmode="numeric" data-conekta="card[exp_year]" autocomplete="cc-exp-year" placeholder="AA" required>
+          </div>
+        </div>
+        <div class="checkout-error" id="checkoutError" style="display:none;"></div>
+        <button type="submit" class="btn btn-primary btn-full checkout-pay-btn" id="payButton">
+          <i class="ph-light ph-lock"></i> <span id="payButtonLabel">Pagar</span>
+        </button>
+        <p class="checkout-secure-note">
+          <i class="ph-light ph-shield-check"></i> Pago seguro procesado por Conekta. Tus datos de tarjeta nunca se almacenan.
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm / alert modal -->
+<div class="pricing-modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+  <div class="pricing-modal" style="max-width:420px;">
+    <div class="pricing-modal-header">
+      <div>
+        <h2 class="pricing-modal-title" id="confirmModalTitle">Confirmar</h2>
+        <p class="pricing-modal-subtitle" id="confirmModalMsg"></p>
+      </div>
+      <button class="pricing-modal-close" id="confirmModalClose" aria-label="Cerrar">
+        <i class="ph-light ph-x"></i>
+      </button>
+    </div>
+    <div class="pricing-modal-body">
+      <div class="confirm-modal-actions">
+        <button class="btn btn-secondary" id="confirmCancelBtn">Cancelar</button>
+        <button class="btn btn-primary" id="confirmOkBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>

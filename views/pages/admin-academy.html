@@ -329,7 +329,7 @@
           '</div>' +
         '</div>' +
         '<div class="academy-resource-right">' +
-          '<span class="academy-resource-price">$' + Number(price).toLocaleString('es-MX') + '</span>' +
+          '<span class="academy-resource-price">' + (price > 0 ? '$' + Number(price).toLocaleString('es-MX') : 'Gratis') + '</span>' +
           '<div class="academy-resource-actions">' +
             '<button onclick="academyCRUD.edit(' + id + ')"><i class="ph-light ph-pencil-simple"></i></button>' +
             '<button class="btn-delete" onclick="academyCRUD.remove(' + id + ')"><i class="ph-light ph-trash"></i></button>' +
@@ -703,7 +703,7 @@
       document.getElementById('formCategory').value = data.Category || data.category || '';
       document.getElementById('formTitle').value = data.Title || data.title || '';
       document.getElementById('formDescription').value = data.Resource_Description || data.description || '';
-      document.getElementById('formPrice').value = data.Price || data.price || '';
+      document.getElementById('formPrice').value = (data.Price !== undefined && data.Price !== null) ? data.Price : (data.price !== undefined && data.price !== null) ? data.price : '';
       document.getElementById('formDuration').value = data.Duration || data.duration || '';
       document.getElementById('formLevel').value = data.Resource_Level || data.level || '';
       document.getElementById('formAvailable').value = (data.isAvailable !== undefined ? data.isAvailable : (data.IsAvailable !== undefined ? data.IsAvailable : true)).toString();
