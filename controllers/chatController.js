@@ -18,7 +18,7 @@
   //  DOM
   // ─────────────────────────────────────────
 
-  var root, launcher, panel, messagesEl, chipsEl, inputEl, sendBtn, typingEl;
+  var root, launcher, backdrop, panel, messagesEl, chipsEl, inputEl, sendBtn, typingEl;
 
   function buildDOM() {
     root = document.createElement('div');
@@ -28,6 +28,7 @@
         '<i class="ph-fill ph-chat-circle-dots"></i>' +
         '<i class="ph-fill ph-x chat-widget-launcher-close"></i>' +
       '</button>' +
+      '<div id="chatBackdrop" class="chat-widget-backdrop"></div>' +
       '<div id="chatPanel" class="chat-widget-panel" role="dialog" aria-label="Asistente DyT_EG">' +
         '<header class="chat-widget-header">' +
           '<div class="chat-widget-header-info">' +
@@ -49,6 +50,7 @@
     document.body.appendChild(root);
 
     launcher = document.getElementById('chatLauncher');
+    backdrop = document.getElementById('chatBackdrop');
     panel = document.getElementById('chatPanel');
     messagesEl = document.getElementById('chatMessages');
     chipsEl = document.getElementById('chatChips');
@@ -56,6 +58,7 @@
     sendBtn = document.getElementById('chatSend');
 
     launcher.addEventListener('click', togglePanel);
+    backdrop.addEventListener('click', closePanel);
     document.getElementById('chatClose').addEventListener('click', closePanel);
     sendBtn.addEventListener('click', onSend);
     inputEl.addEventListener('keydown', function (e) {
@@ -77,6 +80,7 @@
   function openPanel() {
     state.open = true;
     panel.classList.add('chat-widget-panel--open');
+    backdrop.classList.add('chat-widget-backdrop--open');
     launcher.classList.add('chat-widget-launcher--active');
     document.body.classList.add('chat-widget-body-open');
     setTimeout(function () {
@@ -88,6 +92,7 @@
   function closePanel() {
     state.open = false;
     panel.classList.remove('chat-widget-panel--open');
+    backdrop.classList.remove('chat-widget-backdrop--open');
     launcher.classList.remove('chat-widget-launcher--active');
     document.body.classList.remove('chat-widget-body-open');
   }

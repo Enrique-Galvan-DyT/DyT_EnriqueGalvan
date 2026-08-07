@@ -6630,7 +6630,7 @@ body[data-page="resource"] .checkout-success .btn {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 2500;
+  z-index: 2510;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(201, 168, 76, 0.12);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -6649,6 +6649,10 @@ body[data-page="resource"] .checkout-success .btn {
 }
 
 .chat-widget-launcher--active .ph-chat-circle-dots {
+  display: none;
+}
+
+.chat-widget-backdrop {
   display: none;
 }
 
@@ -6971,6 +6975,26 @@ body[data-page="resource"] .checkout-success .btn {
   .chat-widget-launcher {
     right: 0.875rem;
     bottom: 0.875rem;
+  }
+
+  .chat-widget-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 2499;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s ease, visibility 0.18s ease;
+  }
+
+  .chat-widget-backdrop--open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .chat-widget-launcher--active {
+    bottom: calc(85vh + 0.875rem);
   }
 
   .chat-widget-panel {
