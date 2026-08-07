@@ -96,7 +96,7 @@
       '<div class="ticket-detail-body">' + escapeHtml(t.description).replace(/\n/g, '<br>') + '</div>';
 
     var projectHtml = t.projectName
-      ? '<div class="meta-item"><span class="meta-label">Proyecto</span><span class="meta-value"><a href="#/projects/' + t.idProject + '" style="color:var(--accent-primary);text-decoration:none;">' + escapeHtml(t.projectName) + '</a></span></div>'
+      ? '<div class="meta-item"><span class="meta-label">Proyecto</span><span class="meta-value"><a href="project-detail.html?id=' + t.idProject + '" style="color:var(--accent-primary);text-decoration:none;">' + escapeHtml(t.projectName) + '</a></span></div>'
       : '';
 
     document.getElementById('ticketMeta').innerHTML =

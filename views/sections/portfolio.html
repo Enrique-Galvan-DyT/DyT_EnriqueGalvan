@@ -70,7 +70,7 @@
           '<p class="testimonial-snippet">"' + escapeHtml((t.content || '').substring(0, 120)) + '"</p>';
       }
 
-      return '<a href="#/projects/' + p.id + '" class="portfolio-item">' +
+      return '<a href="project-detail.html?id=' + p.id + '" class="portfolio-item">' +
         imgHtml +
         '<div class="portfolio-item-info">' +
           '<h3>' + escapeHtml(p.name) + '</h3>' +

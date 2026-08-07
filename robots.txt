@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://enrique-galvan-dyt.github.io/DyT_EnriqueGalvan/sitemap.xml

@@ -80,6 +80,7 @@ var resourcesAllowed=[
             '<script src="controllers/contactController.js"></script>',
             '<script src="controllers/ticketController.js"></script>',
             '<script src="controllers/projectController.js"></script>',
+            '<script src="controllers/projectDetailController.js"></script>',
             '<script src="controllers/testimonialController.js"></script>',
             '<script src="public/js/games.js"></script>',
             '<script src="public/js/experience.js"></script>',
@@ -302,6 +303,13 @@ function initNavbarScroll(){
   },{passive:true})
 }
 
+function scrollIntoViewOffset(el){
+  var navbar=document.querySelector('.navbar-luxury')
+  var offset=navbar?navbar.offsetHeight:0
+  var top=el.getBoundingClientRect().top+window.pageYOffset-offset
+  window.scrollTo({top:top,behavior:'smooth'})
+}
+
 function initSmoothScroll(){
   document.addEventListener('click',function(e){
     var link=e.target.closest('a[href^="#"]')
@@ -312,7 +320,7 @@ function initSmoothScroll(){
     try{target=document.querySelector(targetId)}catch(err){return}
     if(!target)return
     e.preventDefault()
-    target.scrollIntoView({behavior:'smooth',block:'start'})
+    scrollIntoViewOffset(target)
   })
 }
 
@@ -352,7 +360,7 @@ document.addEventListener('auralis:section-loaded', function(){
    Router — Hash-based page navigation
    ============================================ */
 
-var landingSections=['hero','services','portfolio','about','testimonials','proceso','pricing','faq','academia','contact']
+var landingSections=['hero','services','about','proceso','portfolio','testimonials','pricing','academia','faq','contact']
 var currentPage=null
 
 function initRouter(){
@@ -360,28 +368,70 @@ function initRouter(){
   handleRoute()
 }
 
-var pageTitles={
-  '':'Principal',
-  'login':'Iniciar sesión',
-  'register':'Crear cuenta',
-  'verify':'Verificación de cuenta',
-  'dashboard':'Dashboard',
-  'account':'Mi Cuenta',
-  'tickets':'Mis Tickets',
-  'ticket-new':'Nuevo Ticket',
-  'ticket-detail':'Detalle de Ticket',
-  'admin':'Panel Admin',
-  'admin-tickets':'Administrar Tickets',
-  'admin-academy':'Administrar Academia',
-  'admin-purchases':'Compras de Clientes',
-  'admin-contacts':'Mensajes de Contacto',
-  'admin-users':'Verificar Cuentas'
+var pageMeta={
+  '':{
+    title:'Principal',
+    desc:'DyT_EG - Estudio de desarrollo web en Reynosa, Tamaulipas. Experiencias digitales de alto impacto: landing pages, web apps, e-commerce y dashboards. Servimos a México y LATAM. 50+ proyectos, 98% satisfacción.',
+    index:true
+  },
+  'login':{title:'Iniciar sesión',desc:'Inicia sesión en tu cuenta DyT_EG para consultar tus proyectos, recursos de la academia y tickets de soporte.',index:false},
+  'register':{title:'Crear cuenta',desc:'Crea tu cuenta en DyT_EG y comienza a desarrollar tus proyectos web con nuestro equipo en Reynosa, Tamaulipas.',index:false},
+  'verify':{title:'Verificación de cuenta',desc:'Verifica tu cuenta DyT_EG para activar tu acceso al portal de clientes.',index:false},
+  'dashboard':{title:'Dashboard',desc:'Panel de control de DyT_EG con el estado de tus proyectos, recursos y tickets.',index:false},
+  'account':{title:'Mi Cuenta',desc:'Administra los datos de tu cuenta DyT_EG.',index:false},
+  'tickets':{title:'Mis Tickets',desc:'Consulta y da seguimiento a tus tickets de soporte con el equipo DyT_EG.',index:false},
+  'ticket-new':{title:'Nuevo Ticket',desc:'Abre un nuevo ticket de soporte con DyT_EG.',index:false},
+  'ticket-detail':{title:'Detalle de Ticket',desc:'Seguimiento detallado de tu ticket de soporte DyT_EG.',index:false},
+  'projects':{title:'Proyectos',desc:'Portfolio de proyectos de desarrollo web de DyT_EG en Reynosa, Tamaulipas.',index:true},
+  'proyectos':{title:'Proyectos',desc:'Portfolio de proyectos de desarrollo web de DyT_EG en Reynosa, Tamaulipas.',index:true},
+  'admin':{title:'Panel Admin',desc:'Panel de administración de DyT_EG.',index:false},
+  'admin-tickets':{title:'Administrar Tickets',desc:'Administración de tickets de soporte de DyT_EG.',index:false},
+  'admin-academy':{title:'Administrar Academia',desc:'Administración de recursos de la academia DyT_EG.',index:false},
+  'admin-projects':{title:'Administrar Proyectos',desc:'Administración de proyectos de DyT_EG.',index:false},
+  'admin-purchases':{title:'Compras de Clientes',desc:'Registro de compras de los clientes de la academia DyT_EG.',index:false},
+  'admin-contacts':{title:'Mensajes de Contacto',desc:'Mensajes recibidos a través del formulario de contacto de DyT_EG.',index:false},
+  'admin-users':{title:'Verificar Cuentas',desc:'Verificación de cuentas de usuarios DyT_EG.',index:false}
 }
 var siteName='Desarrollo y Tecnología - Enrique Galván'
 
-function setTitle(key){
-  var name=pageTitles[key]||key
-  document.title=name+' | '+siteName
+function setPageMeta(key){
+  var meta=pageMeta[key]
+  var title=(meta&&meta.title)||key
+  var desc=(meta&&meta.desc)||''
+  document.title=title+' | '+siteName
+  setMetaContent('meta[name="description"]',desc)
+  setMetaContent('meta[property="og:description"]',desc)
+  setMetaContent('meta[name="twitter:description"]',desc)
+  if(key!==''){
+    setMetaContent('meta[property="og:title"]',title+' | '+siteName)
+    setMetaContent('meta[name="twitter:title"]',title+' | '+siteName)
+  }
+  setRouteRobots(meta?meta.index!==false:false)
+}
+
+function setMetaContent(sel,value){
+  var el=document.querySelector(sel)
+  if(el)el.setAttribute('content',value)
+}
+
+function setLinkCanonical(url){
+  var link=document.querySelector('link[rel="canonical"]')
+  if(!link){
+    link=document.createElement('link')
+    link.setAttribute('rel','canonical')
+    document.head.appendChild(link)
+  }
+  link.setAttribute('href',url)
+}
+
+function setRouteRobots(index){
+  var robots=document.querySelector('meta[name="robots"]')
+  if(!robots){
+    robots=document.createElement('meta')
+    robots.setAttribute('name','robots')
+    document.head.appendChild(robots)
+  }
+  robots.setAttribute('content',index?'index,follow':'noindex,nofollow')
 }
 
 function handleRoute(){
@@ -390,25 +440,25 @@ function handleRoute(){
   var route=parts[0]||''
 
   switch(route){
-    case '':showLanding();setTitle('');break
-    case 'login':showPage('login',false);setTitle('login');break
-    case 'register':showPage('register',false);setTitle('register');break
-    case 'verify':showPage('verify',false);setTitle('verify');break
-    case 'dashboard':showPage('dashboard',true);setTitle('dashboard');break
-    case 'account':showPage('account',true);setTitle('account');break
+    case '':showLanding();setPageMeta('');break
+    case 'login':showPage('login',false);setPageMeta('login');break
+    case 'register':showPage('register',false);setPageMeta('register');break
+    case 'verify':showPage('verify',false);setPageMeta('verify');break
+    case 'dashboard':showPage('dashboard',true);setPageMeta('dashboard');break
+    case 'account':showPage('account',true);setPageMeta('account');break
     case 'tickets':
-      if(parts[1]==='new'){showPage('ticket-new',true);setTitle('ticket-new')}
-      else if(parts[1]){showPage('ticket-detail',true);setTitle('ticket-detail')}
-      else{showPage('tickets',true);setTitle('tickets')}
+      if(parts[1]==='new'){showPage('ticket-new',true);setPageMeta('ticket-new')}
+      else if(parts[1]){showPage('ticket-detail',true);setPageMeta('ticket-detail')}
+      else{showPage('tickets',true);setPageMeta('tickets')}
       break
     case 'admin':
-      if(parts[1]==='tickets'){showPage('admin-tickets',true,true);setTitle('admin-tickets')}
-      else if(parts[1]==='academy'){showPage('admin-academy',true,true);setTitle('admin-academy')}
-      else if(parts[1]==='projects'){showPage('admin-projects',true,true);setTitle('admin-projects')}
-      else if(parts[1]==='purchases'){showPage('admin-purchases',true,true);setTitle('admin-purchases')}
-      else if(parts[1]==='contacts'){showPage('admin-contacts',true,true);setTitle('admin-contacts')}
-      else if(parts[1]==='users'){showPage('admin-users',true,true);setTitle('admin-users')}
-      else{showPage('admin',true,true);setTitle('admin')}
+      if(parts[1]==='tickets'){showPage('admin-tickets',true,true);setPageMeta('admin-tickets')}
+      else if(parts[1]==='academy'){showPage('admin-academy',true,true);setPageMeta('admin-academy')}
+      else if(parts[1]==='projects'){showPage('admin-projects',true,true);setPageMeta('admin-projects')}
+      else if(parts[1]==='purchases'){showPage('admin-purchases',true,true);setPageMeta('admin-purchases')}
+      else if(parts[1]==='contacts'){showPage('admin-contacts',true,true);setPageMeta('admin-contacts')}
+      else if(parts[1]==='users'){showPage('admin-users',true,true);setPageMeta('admin-users')}
+      else{showPage('admin',true,true);setPageMeta('admin')}
       break
     case 'academia':
       if(parts[1]){
@@ -417,9 +467,11 @@ function handleRoute(){
       }
       goToLandingSection('academia');break
     case 'projects':
-      if(parts[1]){showPage('project-detail',false);setTitle('proyecto')}
-      else{showPage('projects',false);setTitle('proyectos')}
-      break
+      if(parts[1]){
+        window.location.href = 'project-detail.html?id=' + encodeURIComponent(parts[1])
+        return
+      }
+      showPage('projects',false);setPageMeta('proyectos');break
     case 'inicio':
       goToLandingSection('hero');break
     case 'servicios':
@@ -434,7 +486,7 @@ function handleRoute(){
       goToLandingSection('testimonials');break
     case 'contacto':
       goToLandingSection('contact');break
-    default:showLanding();setTitle('');break
+    default:showLanding();setPageMeta('');break
   }
 }
 
@@ -454,12 +506,22 @@ function showLanding(){
 }
 
 function goToLandingSection(id){
-  var done=function(){setTitle('');scrollToSection(id)}
+  var done=function(){
+    setPageMeta('')
+    scrollToSection(id)
+    clearSectionHash()
+  }
   if(currentPage!==null){
     showLanding().then(done)
   } else {
     done()
   }
+}
+
+function clearSectionHash(){
+  var hash=window.location.hash||''
+  if(!hash||hash.indexOf('#/')!==0)return
+  history.replaceState(null,'',location.pathname+location.search)
 }
 
 function showPage(view,needsAuth,needsAdmin){
@@ -482,10 +544,34 @@ function navigateTo(route){
 }
 
 function scrollToSection(id){
-  setTimeout(function(){
+  var tries=0
+  var MAX_TRIES=3
+  var cancelled=false
+  var scrollKeys={ArrowUp:1,ArrowDown:1,PageUp:1,PageDown:1,Home:1,End:1,' ':1}
+  var events=['wheel','touchstart','touchmove','mousedown','keydown']
+  function cancel(e){
+    if(e.type==='keydown'&&!scrollKeys[e.key])return
+    cancelled=true
+  }
+  events.forEach(function(name){window.addEventListener(name,cancel,{once:true,passive:true})})
+  function attempt(){
+    if(cancelled)return cleanup()
     var el=document.getElementById('section-'+id)
-    if(el)el.scrollIntoView({behavior:'smooth',block:'start'})
-  },300)
+    if(el){
+      var navbar=document.querySelector('.navbar-luxury')
+      var offset=navbar?navbar.offsetHeight:0
+      var top=el.getBoundingClientRect().top+window.pageYOffset-offset
+      var reached=Math.abs(window.pageYOffset-top)<60
+      if(tries===0||!reached)scrollIntoViewOffset(el)
+    }
+    tries++
+    if(tries<MAX_TRIES)setTimeout(attempt,tries===1?1200:1500)
+    else cleanup()
+  }
+  function cleanup(){
+    events.forEach(function(name){window.removeEventListener(name,cancel)})
+  }
+  setTimeout(attempt,300)
 }
 
 function initScrollReveal(){

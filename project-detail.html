@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proyecto | Desarrollo y Tecnología - Enrique Galván</title>
+  <link rel="icon" type="image/png" href="public/media/images/logo-g.png">
+  <link rel="apple-touch-icon" href="public/media/images/logo-g.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#7A2E3A">
+
+  <!-- SEO -->
+  <meta name="description" content="Conoce a detalle el desarrollo de nuestros proyectos: etapas, avances, seguimiento y resultados. Portfolio de DyT_EG - desarrollo web en Reynosa, Tamaulipas.">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="DyT_EG">
+  <meta property="og:title" content="DyT_EG | Proyectos - Portfolio de Desarrollo Web">
+  <meta property="og:description" content="Conoce a detalle el desarrollo de nuestros proyectos: etapas, avances, seguimiento y resultados. DyT_EG - desarrollo web en Reynosa, Tamaulipas.">
+  <meta property="og:url" content="https://enrique-galvan-dyt.github.io/DyT_EnriqueGalvan/project-detail.html">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:image" content="https://enrique-galvan-dyt.github.io/DyT_EnriqueGalvan/public/media/images/Formato-A-v4.png">
+  <meta property="og:image:width" content="1005">
+  <meta property="og:image:height" content="245">
+  <meta property="og:image:alt" content="DyT_EG - Experiencias digitales de alto impacto">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DyT_EG | Proyectos - Portfolio de Desarrollo Web">
+  <meta name="twitter:description" content="Conoce a detalle el desarrollo de nuestros proyectos: etapas, avances, seguimiento y resultados. DyT_EG - desarrollo web en Reynosa, Tamaulipas.">
+  <meta name="twitter:image" content="https://enrique-galvan-dyt.github.io/DyT_EnriqueGalvan/public/media/images/Formato-A-v4.png">
+  <meta name="twitter:image:alt" content="DyT_EG - Experiencias digitales de alto impacto">
+
+  <link rel="canonical" href="https://enrique-galvan-dyt.github.io/DyT_EnriqueGalvan/project-detail.html">
+</head>
+<body data-page="project-detail">
+
+  <!-- Navbar -->
+  <div id="navbar-container"></div>
+
+  <section class="resource-detail-page">
+    <div class="container">
+      <div id="projectLoading" class="resource-detail-loading">
+        <div class="loading-spinner"></div>
+        <p>Cargando proyecto...</p>
+      </div>
+
+      <div id="projectError" class="resource-detail-error" style="display:none;">
+        <i class="ph-light ph-warning-circle"></i>
+        <p id="projectErrorMsg">Proyecto no encontrado</p>
+        <a href="index.html#/portafolio" class="btn btn-secondary">Volver a Proyectos</a>
+      </div>
+
+      <div id="projectContent" style="display:none;">
+        <div class="resource-detail-header">
+          <a href="index.html#/portafolio" class="resource-detail-back">
+            <i class="ph-light ph-arrow-left"></i> Volver a Proyectos
+          </a>
+          <div class="resource-detail-meta">
+            <span class="project-detail-status" id="projectStatus"></span>
+          </div>
+          <h1 class="resource-detail-title" id="projectName"></h1>
+          <p class="resource-detail-desc" id="projectDesc"></p>
+        </div>
+
+        <div id="approvalSection" class="resource-detail-section" style="display:none;">
+          <div class="approval-block" id="approvalBlock">
+            <div class="approval-block-icon"><i class="ph-light ph-globe-hemisphere-west"></i></div>
+            <div class="approval-block-text">
+              <strong>Proyecto oculto</strong>
+              <span>Este proyecto no es visible publicamente hasta que lo permitas.</span>
+            </div>
+            <button type="button" class="vis-toggle" data-approved="false">
+              <span class="vis-toggle-switch"><span class="vis-toggle-knob"></span></span>
+              <span class="vis-toggle-text">Permitir visibilidad</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="bodySection" class="resource-detail-section">
+          <div id="bodyContainer" class="resource-body-container"></div>
+        </div>
+
+        <div id="followUpSection" class="resource-detail-section" style="display:none;">
+          <h2 class="resource-detail-section-title"><i class="ph-light ph-chat-circle-text"></i> Seguimiento del proyecto</h2>
+          <div class="project-thread">
+            <div id="threadList" class="project-thread-list" style="row-gap: 1rem;display: flex;flex-direction: column;margin-block: 1rem;"></div>
+            <div id="threadForm" class="project-thread-form" style="display:none;">
+              <textarea id="threadContent" class="form-textarea" rows="3" maxlength="2000" placeholder="Publica un avance para el cliente..."></textarea>
+              <button type="button" id="threadBtn" class="btn btn-primary btn-sm" style="align-self:flex-end;">
+                <i class="ph-light ph-paper-plane-tilt"></i> Publicar avance
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="testimonialSection" class="resource-detail-section">
+          <h2 class="resource-detail-section-title"><i class="ph-light ph-star"></i> Testimonio del cliente</h2>
+          <div id="testimonialLoading">
+            <div class="testimonial-block">
+              <div class="skeleton" style="height:16px;width:140px;margin-bottom:1.25rem;"></div>
+              <div class="skeleton skeleton-line" style="height:14px;"></div>
+              <div class="skeleton skeleton-line" style="height:14px;width:70%;"></div>
+              <div style="display:flex;align-items:center;gap:0.875rem;margin-top:1.25rem;">
+                <div class="skeleton" style="width:2.75rem;height:2.75rem;border-radius:50%;"></div>
+                <div style="flex:1;">
+                  <div class="skeleton skeleton-line" style="height:12px;width:40%;"></div>
+                  <div class="skeleton skeleton-line" style="height:10px;width:25%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="testimonialDisplay" style="display:none;"></div>
+          <div id="testimonialFormWrap" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="toast-container">
+    <div id="toastMessage" class="toast-message"></div>
+  </div>
+
+  <!-- AURALIS Core -->
+  <script src="public/js/auralis.js"></script>
+</body>
+</html>

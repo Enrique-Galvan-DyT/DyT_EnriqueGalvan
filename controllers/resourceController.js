@@ -32,6 +32,35 @@
         });
     }
 
+    var siteBaseUrl = 'https://enrique-galvan-dyt.github.io/DyT_EnriqueGalvan';
+
+    function setResourceJSONLD(name, desc, image, category, duration) {
+        var script = document.getElementById('resourceJSONLD');
+        if (!script) {
+            script = document.createElement('script');
+            script.id = 'resourceJSONLD';
+            script.type = 'application/ld+json';
+            document.head.appendChild(script);
+        }
+        var ld = {
+            '@context': 'https://schema.org',
+            '@type': 'LearningResource',
+            name: name || 'Recurso',
+            description: desc || '',
+            url: siteBaseUrl + '/resource.html?id=' + encodeURIComponent(resourceId),
+            image: image,
+            inLanguage: 'es',
+            provider: {
+                '@type': 'Organization',
+                name: 'DyT_EG',
+                url: siteBaseUrl + '/'
+            }
+        };
+        if (category) ld.learningResourceType = category;
+        if (duration) ld.timeRequired = duration;
+        script.textContent = JSON.stringify(ld);
+    }
+
     function formatReviewDate(iso) {
         try {
             return new Date(iso).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -795,6 +824,23 @@
                     thumbEl.style.display = 'none';
                 }
             }
+
+            // SEO dinamico: canonical, OG image y datos estructurados
+            var canonical = siteBaseUrl + '/resource.html?id=' + encodeURIComponent(resourceId);
+            var fullTitle = title + ' | Desarrollo y Tecnología - Enrique Galván';
+            var ogImage = thumbnail || siteBaseUrl + '/public/media/images/Formato-A-v4.png';
+            setLinkCanonical(canonical);
+            setMetaContent('meta[property="og:url"]', canonical);
+            setMetaContent('meta[property="og:title"]', fullTitle);
+            setMetaContent('meta[name="twitter:title"]', fullTitle);
+            setMetaContent('meta[property="og:image"]', ogImage);
+            setMetaContent('meta[name="twitter:image"]', ogImage);
+            if (desc) {
+                setMetaContent('meta[name="description"]', desc);
+                setMetaContent('meta[property="og:description"]', desc);
+                setMetaContent('meta[name="twitter:description"]', desc);
+            }
+            setResourceJSONLD(title, desc, ogImage, category, duration);
 
             renderPurchaseArea(price, isPaid, resource);
 

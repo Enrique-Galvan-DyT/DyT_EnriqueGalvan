@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Página no encontrada | Desarrollo y Tecnología - Enrique Galván</title>
+  <link rel="icon" type="image/png" href="public/media/images/logo-g.png">
+
+  <meta name="description" content="La página o el recurso que buscas no fue encontrado en el sitio de DyT_EG. Regresa al inicio, revisa la Academia o el Portafolio.">
+  <meta name="robots" content="noindex,nofollow">
+</head>
+<body data-page="404">
+
+  <!-- Navbar -->
+  <div id="navbar-container"></div>
+
+  <div class="error-404-main">
+    <div class="container error-404-page">
+      <img src="public/media/images/Error-404.png" alt="Error 404 - Página no encontrada" class="error-404-image">
+      <h1 class="error-404-title">Página no encontrada</h1>
+      <p class="error-404-intro">Lo sentimos, no pudimos encontrar la página o el recurso que buscas.</p>
+
+      <div class="error-404-causes">
+        <h2>¿Qué pudo haber pasado?</h2>
+        <ul>
+          <li>El enlace está mal escrito o desactualizado.</li>
+          <li>La página o el recurso fue movido o eliminado.</li>
+          <li>El contenido ya no está disponible o fue retirado.</li>
+          <li>El identificador (id) del enlace es inválido o incompleto.</li>
+          <li>El enlace llegó desde redes sociales, correo u otra web y ya no es válido.</li>
+        </ul>
+      </div>
+
+      <div class="error-404-actions">
+        <a href="index.html" class="btn btn-secondary">Volver al inicio</a>
+        <a href="index.html#/portafolio" class="btn btn-secondary">Ver el Portafolio</a>
+        <a href="index.html#/academia" class="btn btn-secondary">Ir a la Academia</a>
+        <a href="index.html#/contacto" class="btn btn-secondary">Contáctanos</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-container"></div>
+
+  <!-- AURALIS Core -->
+  <script src="public/js/auralis.js"></script>
+  <script>
+    document.addEventListener('auralis:ready', function () {
+      document.title = 'Página no encontrada | Desarrollo y Tecnología - Enrique Galván';
+      var robots = document.querySelector('meta[name="robots"]');
+      if (robots) robots.setAttribute('content', 'noindex,nofollow');
+    });
+  </script>
+</body>
+</html>

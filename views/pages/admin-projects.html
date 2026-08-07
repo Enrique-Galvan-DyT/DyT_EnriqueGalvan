@@ -687,7 +687,7 @@
 
   window.projectCRUD = {
     followUp: function(id) {
-      window.location.hash = '#/projects/' + id;
+      window.location.href = 'project-detail.html?id=' + id;
     },
     edit: function(id) {
       var project = allProjects.find(function(p) { return (p.id) === id; });
