@@ -49,6 +49,7 @@ var paymentStatusRoute = env + "api/payment/status/[id]"
 var paymentWebhookRoute = env + "api/payment/webhook"
 var paymentAdminRoute = env + "api/payment/admin"
 var paymentMineRoute = env + "api/payment/mine"
+var paymentRefundRoute = env + "api/payment/[id]/refund"
 
 // --- UPLOAD ---
 var uploadImageRoute = env + "api/upload/image"

@@ -109,11 +109,27 @@
       var title = p.resourceTitle || ((isPlan ? 'Plan' : 'Recurso') + ' sin titulo');
       var catLabel = isPlan ? 'Plan' : (p.resourceCategory || 'Recurso');
       var paid = p.paymentStatus === 'paid';
+      var refunded = p.purchaseStatus === 'refunded';
       var typeBadge = '<span class="academia-badge academia-badge--all"' +
         (isPlan ? ' style="background:rgba(201,168,76,0.15);color:#C9A84C;"' : '') + '>' + escapeHtml(catLabel) + '</span>';
       var statusBadge = '<span style="display:inline-block;padding:0.1875rem 0.5rem;border-radius:var(--radius-sm);font-size:0.6875rem;font-weight:500;' +
-        (paid ? 'background:rgba(76,175,80,0.12);color:#4CAF50;"' : 'background:rgba(255,152,0,0.12);color:#FF9800;"') +
-        '>' + (paid ? 'Pagado' : escapeHtml(p.paymentStatus || 'pendiente')) + '</span>';
+        (refunded ? 'background:rgba(211,47,47,0.12);color:#EF5350;"'
+          : paid ? 'background:rgba(76,175,80,0.12);color:#4CAF50;"'
+          : 'background:rgba(255,152,0,0.12);color:#FF9800;"') +
+        '>' + (refunded ? 'Reembolsado' : paid ? 'Pagado' : escapeHtml(p.paymentStatus || 'pendiente')) + '</span>';
+
+      var consumed = (p.accessCount || 0) > 0;
+      var evidenceHtml = '<span class="academia-duration" style="' +
+        (consumed ? 'color:#EF5350;' : 'color:var(--text-muted);') + '">' +
+        '<i class="ph-light ' + (consumed ? 'ph-eye' : 'ph-eye-slash') + '"></i> ' +
+        (consumed
+          ? 'Consumido (' + (p.accessCount || 0) + ' accesos' + (p.firstAccessedAt ? ' · ' + formatDate(p.firstAccessedAt) : '') + ')'
+          : 'Sin consumo') +
+        '</span>';
+
+      var refundBtn = (paid && !refunded && p.chargeId)
+        ? '<button title="Reembolsar" onclick="purchaseAdmin.refund(' + p.id + ')"><i class="ph-light ph-currency-circle-dollar"></i></button>'
+        : '';
 
       return '<div class="contact-item">' +
         '<div class="contact-item-left">' +
@@ -124,12 +140,14 @@
             typeBadge +
             '<span class="academia-duration"><i class="ph-light ph-currency-dollar"></i> $' + formatMoney(p.amount) + '</span>' +
             statusBadge +
+            evidenceHtml +
             (p.orderId ? '<span class="academia-duration"><i class="ph-light ph-hash"></i> ' + escapeHtml(p.orderId) + '</span>' : '') +
           '</div>' +
         '</div>' +
         '<div class="contact-item-right">' +
           '<span class="contact-item-date">' + formatDate(p.createdAt) + '</span>' +
           '<div class="contact-item-actions">' +
+            refundBtn +
             '<button title="Copiar resumen" onclick="purchaseAdmin.copy(' + p.id + ')"><i class="ph-light ph-copy"></i></button>' +
           '</div>' +
         '</div>' +
@@ -138,14 +156,37 @@
   }
 
   window.purchaseAdmin = {
+    refund: function(id) {
+      var p = all.find(function(x) { return x.id === id; });
+      if (!p) return;
+      var consumed = (p.accessCount || 0) > 0;
+      if (!confirm('Reembolsar $' + formatMoney(p.amount) + ' a ' + (p.userName || '') + ' (' + (p.userEmail || '') + ')\n\n' +
+          'Compra: ' + (p.resourceTitle || '') + ' [' + (p.resourceCategory || '') + ']\n' +
+          'Evidencia: ' + (consumed ? 'consumido (' + (p.accessCount || 0) + ' accesos)' : 'sin consumo') + '\n\n' +
+          'Se reembolsara por Conekta y se revocara el acceso al recurso. Continuar?')) return;
+      refundPurchase(id).then(function(res) {
+        if (res && res.success) {
+          alert(res.message || 'Reembolso procesado');
+          load();
+        } else {
+          alert((res && res.message) || 'No se pudo procesar el reembolso');
+        }
+      });
+    },
     copy: function(id) {
       var p = all.find(function(x) { return x.id === id; });
       if (!p) return;
+      var consumed = (p.accessCount || 0) > 0;
+      var isPaid = p.paymentStatus === 'paid';
       var txt = 'Cliente: ' + (p.userName || '') + ' (' + (p.userEmail || '') + ')\n' +
         'Adquirio: ' + (p.resourceTitle || '') + ' [' + (p.resourceCategory || '') + ']\n' +
         'Monto: $' + formatMoney(p.amount) + ' ' + (p.currency || 'MXN') + '\n' +
         'Orden: ' + (p.orderId || '-') + '\n' +
-        'Fecha: ' + formatDate(p.createdAt);
+        'Fecha: ' + formatDate(p.createdAt) + '\n' +
+        'Estado: ' + (p.purchaseStatus === 'refunded' ? 'Reembolsado' : isPaid ? 'Pagado' : 'Pendiente') + '\n' +
+        'Consumo: ' + (consumed
+          ? (p.accessCount || 0) + ' accesos' + (p.firstAccessedAt ? ' (desde ' + formatDate(p.firstAccessedAt) + ')' : '')
+          : 'sin consumo');
       var done = function() {
         var flash = document.getElementById('copyFlash');
         if (flash) {

@@ -98,3 +98,22 @@ async function getAdminPurchases() {
         });
     });
 }
+
+// --- ADMIN: reembolsar una compra (Conekta + revocación de acceso) ---
+async function refundPurchase(paymentId) {
+    var user = getLocalStorage('DyT_EG_user');
+    var token = user ? user.token : null;
+    return new Promise(function (resolve) {
+        $.ajax({
+            url: buildUrl(paymentRefundRoute, { id: paymentId }),
+            type: "POST",
+            headers: token ? { "Authorization": "Bearer " + token } : {},
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                resolve({ success: false, message: "Error de conexion con el servidor" });
+            }
+        });
+    });
+}
