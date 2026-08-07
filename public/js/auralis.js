@@ -82,6 +82,7 @@ var resourcesAllowed=[
             '<script src="controllers/projectController.js"></script>',
             '<script src="controllers/projectDetailController.js"></script>',
             '<script src="controllers/testimonialController.js"></script>',
+            '<script src="controllers/chatController.js"></script>',
             '<script src="public/js/games.js"></script>',
             '<script src="public/js/experience.js"></script>',
             '<script src="public/js/auth.js"></script>',

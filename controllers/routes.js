@@ -93,3 +93,7 @@ var contactSubmitRoute = env + "api/contact"
 var getContactInquiriesRoute = env + "api/contact"
 var markContactAsReadRoute = env + "api/contact/[id]/read"
 var deleteContactInquiryRoute = env + "api/contact/[id]"
+
+// --- CHAT (asistente IA) ---
+var chatRoute = env + "api/chat"
+var chatConfigRoute = env + "api/chat/config"
