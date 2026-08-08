@@ -6994,7 +6994,7 @@ body[data-page="resource"] .checkout-success .btn {
   }
 
   .chat-widget-launcher--active {
-    bottom: calc(85vh + 0.875rem);
+    display: none;
   }
 
   .chat-widget-panel {

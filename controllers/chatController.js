@@ -38,7 +38,7 @@
               '<div class="chat-widget-subtitle">En línea</div>' +
             '</div>' +
           '</div>' +
-          '<button type="button" id="chatClose" class="chat-widget-close" aria-label="Cerrar asistente"><i class="ph ph-x"></i></button>' +
+          '<button type="button" id="chatClose" class="chat-widget-close" aria-label="Cerrar asistente"><i class="ph-light ph-x"></i></button>' +
         '</header>' +
         '<div id="chatMessages" class="chat-widget-messages"></div>' +
         '<div id="chatChips" class="chat-widget-chips"></div>' +
